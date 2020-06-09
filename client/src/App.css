@@ -1,0 +1,42 @@
+.App {
+  text-align: center;
+}
+
+.ui.cards {
+  justify-content: center;
+  margin: .875em -.5em !important;
+}
+
+.ui.input {
+  justify-content: center;
+  margin: 24.5px;
+}
+
+.ui.steps {
+  width: 100%;
+  margin: 0px !important;
+}
+
+.ui.positive.button {
+  margin: 1em 0px 1em 0px;
+}
+
+.footerStyle {
+  background-color: white;
+  font-size: 20px;
+  border-radius: 1px solid #E7E7E7;
+  text-align: center;
+  padding: 20px;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  height: 60px;
+  width: 100%;
+}
+
+.phantomStyle {
+  display: block;
+  padding: 20px;
+  height: 60px;
+  width: 100%;
+}
