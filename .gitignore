@@ -1,2 +1,3 @@
-!**/client/node_modules
+client/node_modules
+server/parroquiaDB.pyc
 .DS_Store
