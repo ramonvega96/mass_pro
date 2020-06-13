@@ -37,7 +37,7 @@ function App() {
     <Input fluid icon='search' placeholder='Busca tu parroquia por su nombre!' onChange={e => setFilteredValues(e.target.value)}/>
     <Parroquias parroquias={filteredParroquias}/>
     <Footer>
-      <InscribirParroquia visible={false} onNewParroquia={parroquia => setFilteredParroquias(currentParroquias => [parroquia, ...currentParroquias])}/>
+      <InscribirParroquia onNewParroquia={parroquia => setFilteredParroquias(currentParroquias => [parroquia, ...currentParroquias])}/>
       <EditarParroquia onNewParroquia={parroquia => setFilteredParroquias(currentParroquias => [parroquia, ...currentParroquias])}/>
     </Footer>
   </div>;
