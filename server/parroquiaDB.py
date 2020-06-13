@@ -17,7 +17,10 @@ def crearParroquia(parroquia):
     nit = parroquia.get("nit")
 
     if parroquias.find( { "nit": nit } ).count() > 0:
-        return "ERROR: Una parroquia con este NIT ya existe en el sistema. NIT: " + nit
+        resp = {
+            "error": "Una parroquia con este NIT ya existe en el sistema"
+        }
+        return resp
     
     parroquias.insert(parroquia)
     del parroquia["_id"]
@@ -41,7 +44,6 @@ def editarParroquia(newParroquia):
         {"$set": 
             {
                 "nombre": newParroquia.get("newNombre") if newParroquia.get("newNombre") else parroquia.get("nombre"),
-                "nit": newParroquia.get("newNit") if newParroquia.get("newNit") else parroquia.get("nit"),
                 "parroco": newParroquia.get("newParroco") if newParroquia.get("newParroco") else parroquia.get("parroco"),
                 "capacidad": newParroquia.get("newCapacidad") if newParroquia.get("newCapacidad") else parroquia.get("capacidad"),
                 "password": newParroquia.get("newPassword") if newParroquia.get("newPassword") else parroquia.get("password"),
@@ -51,41 +53,26 @@ def editarParroquia(newParroquia):
         }
     )
 
-    horarios.update(
-        {"nit": nit},
-        {"$set": 
-            {
-                "nit": newParroquia.get("newNit") if newParroquia.get("newNit") else parroquia.get("nit")
-            }
-        }
-    )
-
     return newParroquia
 
 # insertar horario parroquia
 def crearHorarioParroquia(horario):
-    nit = horario.get("nitParroquia")
-    password = horario.get("passwordParroquia")
-
-    parroquia = parroquias.find_one( { "nit": nit } )
-    
-    if parroquia is None:
-        return "ERROR: No existe una parroquia con este NIT en el sistema. NIT: " + nit
-    
-    if parroquia.get("password") != password:
-        return "ERROR: Password incorrecto."
+    nit = horario.get("nit")
 
     if horarios.find( { "nit": nit } ).count() > 0:
-        return "ERROR: Esta parroquia ya tiene sus horarios programados."
+        resp = {
+            "error": "Esta parroquia ya tiene sus horarios programados."
+        }
+        return resp
     
-    obj = {
+    resp = {
         "nit": nit,
         "horario": horario.get("horario")
     }
     
-    horarios.insert(obj)
-    del obj["_id"]
-    return obj
+    horarios.insert(resp)
+    del resp["_id"]
+    return resp
 
 # editar horario parroquia
 def editarHorarioParroquia(newHorario):

@@ -3,6 +3,7 @@ import './App.css';
 import { Parroquias } from './components/Parroquias';
 import { Input } from 'semantic-ui-react'
 import InscribirParroquia from './components/InscribirParroquia';
+import EditarParroquia from './components/EditarParroquia';
 
 
 function App() {
@@ -34,9 +35,10 @@ function App() {
   
   return <div className="App" >
     <Input fluid icon='search' placeholder='Busca tu parroquia por su nombre!' onChange={e => setFilteredValues(e.target.value)}/>
-    <Parroquias parroquias = {filteredParroquias}/>
+    <Parroquias parroquias={filteredParroquias}/>
     <Footer>
-      <InscribirParroquia />
+      <InscribirParroquia visible={false} onNewParroquia={parroquia => setFilteredParroquias(currentParroquias => [parroquia, ...currentParroquias])}/>
+      <EditarParroquia onNewParroquia={parroquia => setFilteredParroquias(currentParroquias => [parroquia, ...currentParroquias])}/>
     </Footer>
   </div>;
 }

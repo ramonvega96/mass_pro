@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Modal, Form, Icon, Step, List, Message } from 'semantic-ui-react'
 
-export default class ModalInscribirParroquia extends Component {
+export default class ModalEditarParroquia extends Component {
 
     constructor(props) {
         super(props);
