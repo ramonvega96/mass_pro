@@ -603,18 +603,10 @@ export default class ModalParroquia extends Component {
             </Modal.Content>
         </Modal>
 
-        <Modal size='large' open={openEditar} onClose={this.close}>
+        <Modal size='small' open={openEditar} onClose={this.close}>
             <Modal.Header>Editar Parroquia</Modal.Header>
             
-            <Step.Group>
-                <Step active={this.state.step === 1} completed={this.state.authStepCompleted}>
-                <Icon name='key' />
-                <Step.Content>
-                    <Step.Title>Autenticación</Step.Title>
-                    <Step.Description>Nit y contraseña</Step.Description>
-                </Step.Content>
-                </Step>
-
+            {this.state.step > 1 && <Step.Group>
                 <Step active={this.state.step === 2} completed={this.state.infoStepCompleted}>
                 <Icon name='info' />
                 <Step.Content>
@@ -630,7 +622,7 @@ export default class ModalParroquia extends Component {
                     <Step.Description>Horarios de las Eucaristias</Step.Description>
                 </Step.Content>
                 </Step>
-            </Step.Group>
+            </Step.Group>}
           
 
             <Modal.Content>
