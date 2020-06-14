@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import { Parroquias } from './components/Parroquias';
 import { Input } from 'semantic-ui-react'
-import InscribirParroquia from './components/InscribirParroquia';
-import EditarParroquia from './components/EditarParroquia';
+import ModalParroquia from './components/ModalParroquia';
 
 
 function App() {
@@ -24,6 +23,28 @@ function App() {
     setFilteredParroquias(parroquias.filter(p => p.nombre.toLowerCase().includes(val)))
   }
 
+  function refreshOnEdit(newParroquia){
+    const parroquia = { 
+      nombre: newParroquia.newNombre, 
+      nit: newParroquia.newNit, 
+      parroco: newParroquia.newParroco, 
+      capacidad: newParroquia.newCapacidad, 
+      password: newParroquia.newPassword, 
+      direccion: newParroquia.newDireccion,
+      telefono: newParroquia.newTelefono
+    };
+    
+    setParroquias(parroquias.filter(p => p.nit !== newParroquia.nit));
+    setFilteredParroquias(parroquias.filter(p => p.nit !== newParroquia.nit));
+    setParroquias(currentParroquias => [parroquia, ...currentParroquias]);
+    setFilteredParroquias(currentParroquias => [parroquia, ...currentParroquias]);
+  }
+
+  function refreshOnAdd(parroquia){
+    setFilteredParroquias(currentParroquias => [parroquia, ...currentParroquias]);
+    setParroquias(currentParroquias => [parroquia, ...currentParroquias]);
+  }
+
   function Footer({ children }) {
     return (
       <div>
@@ -37,8 +58,7 @@ function App() {
     <Input fluid icon='search' placeholder='Busca tu parroquia por su nombre!' onChange={e => setFilteredValues(e.target.value)}/>
     <Parroquias parroquias={filteredParroquias}/>
     <Footer>
-      <InscribirParroquia onNewParroquia={parroquia => setFilteredParroquias(currentParroquias => [parroquia, ...currentParroquias])}/>
-      <EditarParroquia onNewParroquia={parroquia => setFilteredParroquias(currentParroquias => [parroquia, ...currentParroquias])}/>
+      <ModalParroquia onNewParroquia={p => refreshOnAdd(p)} onParroquiaChange={p => refreshOnEdit(p)}/>
     </Footer>
   </div>;
 }

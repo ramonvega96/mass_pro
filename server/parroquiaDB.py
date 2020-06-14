@@ -29,26 +29,34 @@ def crearParroquia(parroquia):
 # editar parroquia
 def editarParroquia(newParroquia):
     nit = newParroquia.get("nit")
-    password = newParroquia.get("password")
+    newNit = newParroquia.get("newNit")
 
-    parroquia = parroquias.find_one( { "nit": nit } )
-    
-    if parroquia is None:
-        return "ERROR: No existe una parroquia con este NIT en el sistema. NIT: " + nit
-    
-    if parroquia.get("password") != password:
-        return "ERROR: Password incorrecto."
+    if nit != newNit and parroquias.find( { "nit": newNit } ).count() > 0:
+        resp = {
+            "error": "Ya existe una parroquia con el nuevo NIT"
+        }
+        return resp
 
     parroquias.update(
         {"nit": nit},
         {"$set": 
             {
-                "nombre": newParroquia.get("newNombre") if newParroquia.get("newNombre") else parroquia.get("nombre"),
-                "parroco": newParroquia.get("newParroco") if newParroquia.get("newParroco") else parroquia.get("parroco"),
-                "capacidad": newParroquia.get("newCapacidad") if newParroquia.get("newCapacidad") else parroquia.get("capacidad"),
-                "password": newParroquia.get("newPassword") if newParroquia.get("newPassword") else parroquia.get("password"),
-                "direccion": newParroquia.get("newDireccion") if newParroquia.get("newDireccion") else parroquia.get("direccion"),
-                "telefono": newParroquia.get("newTelefono") if newParroquia.get("newTelefono") else parroquia.get("telefono")
+                "nombre": newParroquia.get("newNombre"),
+                "nit": newParroquia.get("newNit"),
+                "parroco": newParroquia.get("newParroco"),
+                "capacidad": newParroquia.get("newCapacidad"),
+                "password": newParroquia.get("newPassword"),
+                "direccion": newParroquia.get("newDireccion"),
+                "telefono": newParroquia.get("newTelefono")
+            }
+        }
+    )
+
+    horarios.update(
+        {"nit": nit},
+        {"$set": 
+            {
+                "nit": newParroquia.get("newNit") if newParroquia.get("newNit") else parroquia.get("nit")
             }
         }
     )
@@ -76,32 +84,27 @@ def crearHorarioParroquia(horario):
 
 # editar horario parroquia
 def editarHorarioParroquia(newHorario):
-    nit = newHorario.get("nitParroquia")
-    password = newHorario.get("passwordParroquia")
-
-    parroquia = parroquias.find_one( { "nit": nit } )
+    nit = newHorario.get("nit")
     horario = horarios.find_one( { "nit": nit } )
-    
-    if parroquia is None:
-        return "ERROR: No existe una parroquia con este NIT en el sistema. NIT: " + nit
-
-    if horario is None:
-        return "ERROR: Aun no se ha definido un horario para esta parroquia."
-    
-    if parroquia.get("password") != password:
-        return "ERROR: Password incorrecto."
 
     horarios.update(
         {"nit": nit},
         {"$set": 
             {
-                "horario.lun": newHorario.get("horario").get("lun") if newHorario.get("horario").get("lun") else horario.get("horario").get("lun"),
-                "horario.mar": newHorario.get("horario").get("mar") if newHorario.get("horario").get("mar") else horario.get("horario").get("mar"),
-                "horario.mie": newHorario.get("horario").get("mie") if newHorario.get("horario").get("mie") else horario.get("horario").get("mie"),
-                "horario.jue": newHorario.get("horario").get("jue") if newHorario.get("horario").get("jue") else horario.get("horario").get("jue"),
-                "horario.vie": newHorario.get("horario").get("vie") if newHorario.get("horario").get("vie") else horario.get("horario").get("vie"),
-                "horario.sab": newHorario.get("horario").get("sab") if newHorario.get("horario").get("sab") else horario.get("horario").get("sab"),
-                "horario.dom": newHorario.get("horario").get("dom") if newHorario.get("horario").get("dom") else horario.get("horario").get("dom"),
+                "horario.lunAm": newHorario.get("horario").get("lunAm"),
+                "horario.marAm": newHorario.get("horario").get("marAm"),
+                "horario.mieAm": newHorario.get("horario").get("mieAm"),
+                "horario.jueAm": newHorario.get("horario").get("jueAm"),
+                "horario.vieAm": newHorario.get("horario").get("vieAm"),
+                "horario.sabAm": newHorario.get("horario").get("sabAm"),
+                "horario.domAm": newHorario.get("horario").get("domAm"),
+                "horario.lunPm": newHorario.get("horario").get("lunPm"),
+                "horario.marPm": newHorario.get("horario").get("marPm"),
+                "horario.miePm": newHorario.get("horario").get("miePm"),
+                "horario.juePm": newHorario.get("horario").get("juePm"),
+                "horario.viePm": newHorario.get("horario").get("viePm"),
+                "horario.sabPm": newHorario.get("horario").get("sabPm"),
+                "horario.domPm": newHorario.get("horario").get("domPm")
             }
         }
     )
@@ -121,4 +124,34 @@ def getParroquias():
         "parroquias": res
     }
     
+    return obj
+
+def autenticarParroquia(data):
+    nit = data.get("nit")
+    password = data.get("password")
+    
+    parroquia = parroquias.find_one( { "nit": nit } )
+
+    if parroquia is None:
+        resp = {
+            "error": "No existe una parroquia con este NIT en el sistema."
+        }
+        return resp
+    
+    if parroquia.get("password") != password:
+        resp = {
+            "error": "Password incorrecto."
+        }
+        return resp
+
+    horario = horarios.find_one( { "nit": nit } )
+    
+    del parroquia["_id"]
+    del horario["_id"]
+
+    obj = {
+        "parroquia" : parroquia,
+        "horario" : horario
+    }
+
     return obj

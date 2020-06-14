@@ -36,4 +36,10 @@ def editarHorarioParroquia():
     NBData = request.get_json()
     return parroquiaDB.editarHorarioParroquia(NBData)
 
+@app.route('/auth', methods = ['POST'])
+def autenticarParroquia():
+    # Autenticacion con nit y password
+    NBData = request.get_json()
+    return parroquiaDB.autenticarParroquia(NBData)
+
 app.run()
