@@ -416,7 +416,7 @@ export default class ModalParroquia extends Component {
                                 value={this.state.nit}/>
                         </Form.Field>
                         <Form.Field>
-                            <label id='check-auto-eval-covid'>¿Habilitar autoevaluación COVID?</label>
+                            <label id='auto-eval-covid'>¿Habilitar autoevaluación COVID?</label>
                             <Checkbox 
                                 label='Si, habilitar autoevaluación COVID'
                                 checked={this.state.autoEvalCovid}
@@ -911,7 +911,7 @@ export default class ModalParroquia extends Component {
                                 value={this.state.nit}/>
                         </Form.Field>
                         <Form.Field>
-                            <label id='check-auto-eval-covid'>¿Habilitar autoevaluación COVID?</label>
+                            <label id='auto-eval-covid'>¿Habilitar autoevaluación COVID?</label>
                             <Checkbox 
                                 label='Si, habilitar autoevaluación COVID'
                                 checked={this.state.autoEvalCovid}

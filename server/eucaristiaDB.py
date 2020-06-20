@@ -135,14 +135,11 @@ def crearInscripcion(data):
             obj = {
                 "id": i,
                 "asistentes": asistentes,
-                "parroquia": parroquia.get("nombre"),
-                "direccion": parroquia.get("direccion"),
                 "hora": next((x.get('text') for x in horarios if x.get('key') == i.split(":")[0]), None),
                 "dia": semana.get("initDay") + next((x.get('value') for x in dias if x.get('key') == i.split(":")[1]), None),
                 "mes": semana.get("initMonth") - 1,
                 "year": semana.get("initYear"),
-                "cupos": int(parroquia.get("capacidad")) - 1,
-                "ubicacion": parroquia.get("ubicacion")
+                "cupos": int(parroquia.get("capacidad")) - 1
             }
             
             eucaristias_db.insert(obj)
@@ -188,11 +185,20 @@ def getEucaristias(data):
     resp = {"eucaristias": lista}
     return resp
 
-def getEucaristiasForUser(idsList):
+def getEucaristiasForUser(data):
+  idsList = data.get("reservas")
+  userId = data.get("id")
   reservas = []
   
   for i in idsList:
     reserva = eucaristias_db.find_one( { "id": i } )
+    asistentes = reserva.get("asistentes")
+
+    for j in asistentes:
+        if j.get("covidForm") is not None and j.get("id") == userId:
+            reserva["covidForm"] = j.get("covidForm")
+            break
+    
     del reserva["asistentes"]
     del reserva["_id"]
     del reserva["cupos"]
@@ -243,9 +249,6 @@ def getEucaristiasPorDia(data):
       del i["dia"]
       del i["mes"]
       del i["year"]
-      del i["ubicacion"]
-      del i["parroquia"]
-      del i["direccion"]
 
       if len(i.get("asistentes")) > 0:
         i.get("asistentes").sort(key=lambda x: x.get("nombre"))
@@ -254,7 +257,25 @@ def getEucaristiasPorDia(data):
   resp = {"eucaristias": lista}
   return resp
 
+def postUserCovidForm(data):
+    userId = data.get("userId")
+    eucaristiaId = data.get("reservaId")
 
+    eucaristia = eucaristias_db.find_one( { "id": eucaristiaId } )
+    asistentes = eucaristia.get("asistentes")
 
+    for i in asistentes:
+        if i.get("id") == userId:
+            i["covidForm"] = data.get("covidForm")
 
+    eucaristias_db.update(
+          {"id": eucaristiaId},
+          {"$set": 
+              {
+                  "asistentes": asistentes
+              }
+          }
+      )
 
+    del eucaristia["_id"]
+    return eucaristia

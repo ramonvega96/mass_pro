@@ -146,3 +146,18 @@ def getHorarioParroquia(data):
     horario = horarios.find_one( { "nit": data } )
     del horario["_id"]
     return horario
+
+def getParroquiasWithIds(ids):
+    parroquiasList = []
+    
+    for i in ids:
+        parroquia = parroquias.find_one( { "nit": i } )
+        del parroquia["_id"]
+        parroquiasList.append(parroquia)
+    
+    obj = {
+        "parroquias": parroquiasList
+    }
+    
+    return obj
+
