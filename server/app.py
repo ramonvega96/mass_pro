@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 from flask import request
-import parroquiaDB 
+import parroquiaDB, userDB, eucaristiaDB, semanaDB
  
 app = Flask(__name__)
  
@@ -41,5 +41,59 @@ def autenticarParroquia():
     # Autenticacion con nit y password
     NBData = request.get_json()
     return parroquiaDB.autenticarParroquia(NBData)
+
+@app.route('/authUser', methods = ['POST'])
+def autenticarUsuario():
+    # Autenticacion con id y password
+    NBData = request.get_json()
+    return userDB.autenticarUsuario(NBData)
+
+@app.route('/createUser', methods = ['POST'])
+def crearUsuario():
+    # Autenticacion con id y password
+    NBData = request.get_json()
+    return userDB.crearUsuario(NBData)
+
+@app.route('/getHorarioParroquia', methods = ['POST'])
+def getHorarioParroquia():
+    # Get horario parroquia con nit
+    NBData = request.get_json()
+    return parroquiaDB.getHorarioParroquia(NBData)
+
+@app.route('/crearInscripcion', methods = ['POST'])
+def crearInscripcion():
+    # Crear inscripcion en una misa de una parroquia
+    NBData = request.get_json()
+    return eucaristiaDB.crearInscripcion(NBData)
+
+@app.route('/getEucaristias', methods = ['POST'])
+def getEucaristias():
+    # Get eucaristias de una parroquia
+    NBData = request.get_json()
+    return eucaristiaDB.getEucaristias(NBData)
+
+@app.route('/getEucaristiasForUser', methods = ['POST'])
+def getEucaristiasForUser():
+    # Get eucaristias para un usuario especifico - sus reservas
+    NBData = request.get_json()
+    return eucaristiaDB.getEucaristiasForUser(NBData)
+
+@app.route('/getSemanas', methods = ['GET'])
+def getSemanas():
+    response = jsonify(semanaDB.getSemanas())
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+@app.route('/deleteReserva', methods = ['PATCH'])
+def deleteReserva():
+    # Get eucaristias para un usuario especifico - sus reservas
+    NBData = request.get_json()
+    return eucaristiaDB.deleteReserva(NBData)
+
+@app.route('/getEucaristiasPorDia', methods = ['POST'])
+def getEucaristiasPorDia():
+    # Get eucaristias para un usuario especifico - sus reservas
+    NBData = request.get_json()
+    return eucaristiaDB.getEucaristiasPorDia(NBData)
 
 app.run()

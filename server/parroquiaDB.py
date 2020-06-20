@@ -29,34 +29,19 @@ def crearParroquia(parroquia):
 # editar parroquia
 def editarParroquia(newParroquia):
     nit = newParroquia.get("nit")
-    newNit = newParroquia.get("newNit")
-
-    if nit != newNit and parroquias.find( { "nit": newNit } ).count() > 0:
-        resp = {
-            "error": "Ya existe una parroquia con el nuevo NIT"
-        }
-        return resp
 
     parroquias.update(
         {"nit": nit},
         {"$set": 
             {
                 "nombre": newParroquia.get("newNombre"),
-                "nit": newParroquia.get("newNit"),
+                "diocesis": newParroquia.get("newDiocesis"),
+                "ubicacion": newParroquia.get("newUbicacion"),
                 "parroco": newParroquia.get("newParroco"),
                 "capacidad": newParroquia.get("newCapacidad"),
                 "password": newParroquia.get("newPassword"),
                 "direccion": newParroquia.get("newDireccion"),
                 "telefono": newParroquia.get("newTelefono")
-            }
-        }
-    )
-
-    horarios.update(
-        {"nit": nit},
-        {"$set": 
-            {
-                "nit": newParroquia.get("newNit") if newParroquia.get("newNit") else parroquia.get("nit")
             }
         }
     )
@@ -155,3 +140,8 @@ def autenticarParroquia(data):
     }
 
     return obj
+
+def getHorarioParroquia(data):
+    horario = horarios.find_one( { "nit": data } )
+    del horario["_id"]
+    return horario
