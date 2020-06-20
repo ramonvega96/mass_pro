@@ -1,5 +1,14 @@
 import React, { Component } from 'react'
 import { Button, Modal, Form, Icon, Step, List, Message } from 'semantic-ui-react'
+import jsPDF from 'jspdf';
+import "jspdf-autotable";
+
+import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from '@material-ui/pickers';
 
 export default class ModalParroquia extends Component {
 
@@ -7,8 +16,11 @@ export default class ModalParroquia extends Component {
         super(props);
         this.state = { 
             openInscribir: false,
-            openEditar: false, 
+            openEditar: false,
+            openDownloadList: false,
+            
             step: 1,
+
             authStepCompleted: false,
             infoStepCompleted: false,
             horarioStepCompleted: false,
@@ -26,16 +38,57 @@ export default class ModalParroquia extends Component {
             hSabAm: [],
             hSabPm: [],
             hDomAm: [],
-            hDomPm: []
+            hDomPm: [],
+
+            selectedDate: new Date(),
+            eucaristias: []
         }
     }
 
-    showInscribir = () => this.setState({ openInscribir: true })
-    showEditar = () => this.setState({ openEditar: true })
+    showInscribir = () => this.setState({ openInscribir: true, size: 'small' })
+    showEditar = () => this.setState({ openEditar: true, size: 'mini' })
+    showDownloadList = () => this.setState({ openDownloadList: true, size: 'mini' })    
+    backToFirstStep = () => this.setState({ step: 1, errorCreando: "" })    
+    
+    downloadPdf = (e) => {     
+        const unit = "pt";
+        const size = "A4";
+        const orientation = "portrait";
+
+        const marginLeft = 40;
+        const doc = new jsPDF(orientation, unit, size);
+
+        doc.setFontSize(15);
+
+        const title = "Lista de Asistencia - " + this.state.nombre;
+        
+        const months = ["Enero", "Febrero", "Marzo","Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const fecha = this.state.selectedDate.getDate() + " de " + months[this.state.selectedDate.getMonth()] + " de " + this.state.selectedDate.getFullYear();
+        const hora = e.hora;
+        
+        const headers = [["NOMBRE", "C.C. / T.I.", "TELÉFONO", "DIRECCIÓN", "UBICACIÓN", "FIRMA"]];
+
+        const data = e.asistentes.map(a => [a.nombre, a.id, a.telefono, a.direccion, a.ubicacion]);
+
+        let content = {
+            theme: "grid",
+            startY: 90,
+            head: headers,
+            body: data
+        };
+
+        doc.text(title, marginLeft, 40);
+        doc.text("Fecha: " + fecha, marginLeft, 60);
+        doc.text("Hora: " + hora, marginLeft, 80);
+        doc.autoTable(content);
+        doc.save(fecha + " - " + hora + ".pdf")
+    }
 
     close = () => this.setState({ 
         openInscribir: false,
         openEditar: false,
+        openDownloadList: false,
+
         step: 1,
         authStepCompleted: false,
         infoStepCompleted: false,
@@ -53,6 +106,11 @@ export default class ModalParroquia extends Component {
         capacidad: "",
         password: "",
         cPassword: "",
+        diocesis: "",
+        ubicacion: "",
+
+        selectedDate: new Date(),
+        eucaristias: [],
 
         hLunAm: [],
         hLunPm: [],
@@ -70,7 +128,6 @@ export default class ModalParroquia extends Component {
         hDomPm: []
     });
   
-  backToFirstStep = () => this.setState({ step: 1, errorCreando: "" })
   
   checkDataParroquia() {
       if(this.state.nombre &&
@@ -82,6 +139,8 @@ export default class ModalParroquia extends Component {
         this.state.parroco &&
         !isNaN(this.state.capacidad) &&
         this.state.capacidad &&
+        this.state.diocesis &&
+        this.state.ubicacion &&
         this.state.password &&
         this.state.cPassword &&
         this.state.cPassword === this.state.password){
@@ -103,8 +162,7 @@ export default class ModalParroquia extends Component {
       }
 
   render() {
-    const { openInscribir } = this.state
-    const { openEditar } = this.state  
+    const { openInscribir, openEditar, openDownloadList, size } = this.state
 
     const handleChange = (e, {value, id}) => {
         switch (id) {
@@ -158,22 +216,22 @@ export default class ModalParroquia extends Component {
     const horariosAm = [
         {
           key: '600',
-          text: '6:00 a.m',
+          text: '06:00 a.m',
           value: '600'
         },
         {
           key: '700',
-          text: '7:00 a.m',
+          text: '07:00 a.m',
           value: '700'
         },
         {
             key: '800',
-            text: '8:00 a.m',
+            text: '08:00 a.m',
             value: '800'
         },
         {
             key: '900',
-            text: '9:00 a.m',
+            text: '09:00 a.m',
             value: '900'
         },
         {
@@ -196,44 +254,85 @@ export default class ModalParroquia extends Component {
         },
         {
           key: '1300',
-          text: '1:00 p.m',
+          text: '01:00 p.m',
           value: '1300'
         },
         {
             key: '1400',
-            text: '2:00 p.m',
+            text: '02:00 p.m',
             value: '1400'
         },
         {
             key: '1500',
-            text: '3:00 p.m',
+            text: '03:00 p.m',
             value: '1500'
         },
         {
             key: '1600',
-            text: '4:00 p.m',
+            text: '04:00 p.m',
             value: '1600'
         },
         {
             key: '1700',
-            text: '5:00 p.m',
+            text: '05:00 p.m',
             value: '1700'
         },
         {
             key: '1800',
-            text: '6:00 p.m',
+            text: '06:00 p.m',
             value: '1800'
         },
       ]
+
+      const handleDateChange = (date) => {
+        this.setState({ eucaristias: [], selectedDate: date });
+    
+        var errorMsg = "";
+        const fecha = {
+            "dia": date.getDate(),
+            "mes": date.getMonth(),
+            "year": date.getFullYear(),
+            "id": this.state.nit
+        }
+
+        fetch("/getEucaristiasPorDia", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(fecha)
+          }).then(res =>
+            res.json().then(resp => {
+                if(!res.ok){
+                    errorMsg = "Error interno. Por favor vuelva a intentar.";
+                    this.setState({ errorGetInscritos: errorMsg });
+                }
+                else if (resp.eucaristias.length < 1){
+                    errorMsg = "Aún no hay cupos reservados en las Eucaristias de este día.";
+                    this.setState({ errorGetInscritos: errorMsg });
+                }
+                else{
+                    resp.eucaristias.forEach(e => {
+                        e.hValue = e.hora.endsWith("a.m") ? parseInt(horariosAm.find(obj => {return obj.text === e.hora}).value) : parseInt(horariosPm.find(obj => {return obj.text === e.hora}).value)
+                    });
+                    resp.eucaristias.sort(function(a, b) { 
+                        return a.hValue - b.hValue;
+                    })                    
+                    this.setState({ errorGetInscritos: "", eucaristias: resp.eucaristias });
+                }
+            })
+          );
+      };
 
     return (
       <div>
         <List celled horizontal>
             <List.Item href='#' onClick={this.showInscribir}>Agregar Parroquia</List.Item>
             <List.Item href='#' onClick={this.showEditar}>Editar Parroquia</List.Item>
+            <List.Item href='#' onClick={this.showDownloadList}>Descargar Listas</List.Item>
         </List>
 
-        <Modal size='small' open={openInscribir} onClose={this.close}>
+        <Modal size={size} open={openInscribir} onClose={this.close}>
             <Modal.Header>Agregar Parroquia</Modal.Header>
             
             <Step.Group> 
@@ -257,6 +356,20 @@ export default class ModalParroquia extends Component {
 
             <Modal.Content>
                 {this.state.step === 1 && <Form>
+                    <Form.Field required>
+                        <label>Diocesis</label>
+                        <input
+                            placeholder='Diocesis a la que pertenece' 
+                            onChange={e => this.setState({ diocesis: e.target.value }, () => this.checkDataParroquia())}
+                            value={this.state.diocesis}/>
+                    </Form.Field>
+                    <Form.Field required>
+                        <label>Ubicación: Ciudad / Municipio</label>
+                        <input
+                            placeholder='Ciudad / Municipio donde se encuentra' 
+                            onChange={e => this.setState({ ubicacion: e.target.value }, () => this.checkDataParroquia())}
+                            value={this.state.ubicacion}/>
+                    </Form.Field>                          
                     <Form.Field required>
                         <label>Nombre de la Parroquia</label>
                         <input
@@ -524,7 +637,9 @@ export default class ModalParroquia extends Component {
                             
                             var errorMsg = "";
 
-                            const parroquia = { 
+                            const parroquia = {
+                                diocesis: this.state.diocesis,
+                                ubicacion: this.state.ubicacion, 
                                 nombre: this.state.nombre, 
                                 nit: this.state.nit, 
                                 parroco: this.state.parroco, 
@@ -603,7 +718,7 @@ export default class ModalParroquia extends Component {
             </Modal.Content>
         </Modal>
 
-        <Modal size='small' open={openEditar} onClose={this.close}>
+        <Modal size={size} open={openEditar} onClose={this.close}>
             <Modal.Header>Editar Parroquia</Modal.Header>
             
             {this.state.step > 1 && <Step.Group>
@@ -689,10 +804,12 @@ export default class ModalParroquia extends Component {
                                         this.setState({ errorAuth: errorMsg });
                                     }
                                     else{
-                                        this.setState({ 
+                                        this.setState({
+                                            size:'small', 
                                             authStepCompleted: true,
                                             step: 2,
-                                            newNit: data.parroquia.nit,
+                                            diocesis: data.parroquia.diocesis,
+                                            ubicacion: data.parroquia.ubicacion,
                                             nombre: data.parroquia.nombre,
                                             parroco: data.parroquia.parroco, 
                                             capacidad: data.parroquia.capacidad,
@@ -722,6 +839,20 @@ export default class ModalParroquia extends Component {
                 </Form>}
 
                 {this.state.step === 2 && <Form>
+                    <Form.Field required>
+                        <label>Diocesis</label>
+                        <input
+                            placeholder='Diocesis a la que pertenece' 
+                            onChange={e => this.setState({ diocesis: e.target.value }, () => this.checkDataParroquia())}
+                            value={this.state.diocesis}/>
+                    </Form.Field>
+                    <Form.Field required>
+                        <label>Ubicación: Ciudad / Municipio</label>
+                        <input
+                            placeholder='Ciudad / Municipio donde se encuentra' 
+                            onChange={e => this.setState({ ubicacion: e.target.value }, () => this.checkDataParroquia())}
+                            value={this.state.ubicacion}/>
+                    </Form.Field>  
                     <Form.Field required>
                         <label>Nombre de la Parroquia</label>
                         <input
@@ -760,9 +891,9 @@ export default class ModalParroquia extends Component {
                     <Form.Field required>
                         <label>Nit de la Parroquia</label>
                         <input 
-                            placeholder='Nit Parroquia (sin puntos, guiones o espacios)' 
-                            onChange={e => this.setState({ newNit: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.newNit}/>
+                            placeholder='Nit Parroquia (sin puntos, guiones o espacios)'
+                            disabled={true}
+                            value={this.state.nit}/>
                     </Form.Field>
                     <Form.Group widths='equal'>
                         <Form.Field required>
@@ -990,8 +1121,9 @@ export default class ModalParroquia extends Component {
 
                             const parroquia = {
                                 nit: this.state.nit, 
-                                newNombre: this.state.nombre, 
-                                newNit: this.state.newNit, 
+                                newNombre: this.state.nombre,
+                                newDiocesis: this.state.diocesis,
+                                newUbicacion: this.state.ubicacion,
                                 newParroco: this.state.parroco, 
                                 newCapacidad: this.state.capacidad, 
                                 newPassword: this.state.password, 
@@ -1000,7 +1132,7 @@ export default class ModalParroquia extends Component {
                             };
 
                             const horario = { 
-                                nit: this.state.newNit, 
+                                nit: this.state.nit, 
                                 horario: {
                                     lunAm: this.state.hLunAm,
                                     marAm: this.state.hMarAm,
@@ -1062,6 +1194,162 @@ export default class ModalParroquia extends Component {
                                 })
                               );
                         }}
+                        />
+                    </Button.Group>
+                </Form>}
+            </Modal.Content>
+        </Modal>
+
+        <Modal size={size} open={openDownloadList} onClose={this.close}>
+            <Modal.Header>Descargar Listas</Modal.Header>          
+
+            <Modal.Content>
+            {this.state.step === 1 && <Form>
+                    {this.state.errorAuth && <Message
+                        error
+                        header='Error en la autenticación'
+                        content={this.state.errorAuth}
+                        visible
+                    />}
+                    <Form.Field required>
+                        <label>Nit de la Parroquia</label>
+                        <input
+                            placeholder='Nit de la Parroquia' 
+                            onChange={e => this.setState({ nit: e.target.value }, () => this.checkDataAuth())}
+                            value={this.state.nit}/>
+                    </Form.Field>
+                    <Form.Field required>
+                        <label>Contraseña</label>
+                        <input
+                            type='password'
+                            placeholder='Contraseña' 
+                            onChange={e => this.setState({ password: e.target.value }, () => this.checkDataAuth())}
+                            value={this.state.password}/>
+                    </Form.Field>
+                    <Button.Group>
+                        <Button
+                        negative
+                        icon='arrow circle left'
+                        labelPosition='left'
+                        content='Volver'
+                        onClick={this.close}
+                        />
+                        <Button.Or text='O'/>
+                        <Button
+                        positive
+                        icon='arrow circle right'
+                        labelPosition='right'
+                        content='Siguiente'
+                        disabled={!this.state.authStepCompleted}
+                        onClick={() => {
+
+                            var errorMsg = "";
+
+                            const authData = {
+                                nit: this.state.nit,
+                                password: this.state.password
+                            }
+
+                            fetch("/auth", {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(authData)
+                              }).then(res =>
+                                res.json().then(data => {
+                                    if(!res.ok){
+                                        errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                        this.setState({ errorAuth: errorMsg });
+                                    }
+                                    else if (data.error){
+                                        errorMsg = data.error;
+                                        this.setState({ errorAuth: errorMsg });
+                                    }
+                                    else{
+                                        handleDateChange(this.state.selectedDate);
+                                        this.setState({
+                                            authStepCompleted: true,
+                                            step: 2,
+                                            diocesis: data.parroquia.diocesis,
+                                            ubicacion: data.parroquia.ubicacion,
+                                            nombre: data.parroquia.nombre,
+                                            parroco: data.parroquia.parroco, 
+                                            capacidad: data.parroquia.capacidad,
+                                            direccion: data.parroquia.direccion,
+                                            telefono: data.parroquia.telefono,
+                                            hLunAm: data.horario.horario.lunAm,
+                                            hLunPm: data.horario.horario.lunPm,
+                                            hMarAm: data.horario.horario.marAm,
+                                            hMarPm: data.horario.horario.marPm,
+                                            hMieAm: data.horario.horario.mieAm,
+                                            hMiePm: data.horario.horario.miePm,
+                                            hJueAm: data.horario.horario.jueAm,
+                                            hJuePm: data.horario.horario.juePm,
+                                            hVieAm: data.horario.horario.vieAm,
+                                            hViePm: data.horario.horario.viePm,
+                                            hSabAm: data.horario.horario.sabAm,
+                                            hSabPm: data.horario.horario.sabPm,
+                                            hDomAm: data.horario.horario.domAm,
+                                            hDomPm: data.horario.horario.domPm
+                                        });
+                                    }
+                                })
+                              );
+                        }}
+                        />
+                    </Button.Group>
+                </Form>}
+
+                {this.state.step === 2 && <Form>
+                    
+                    {this.state.errorGetInscritos && <Message
+                        error
+                        header='Error'
+                        content={this.state.errorGetInscritos}
+                        visible
+                    />}
+
+                    <Form.Field>
+                        <div id="date-picker-dialog">
+                            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                <KeyboardDatePicker
+                                    id="date-picker-dialog"
+                                    format="dd/MM/yyyy"
+                                    value={this.state.selectedDate}
+                                    onChange={handleDateChange}
+                                    KeyboardButtonProps={{'aria-label': 'change date'}}
+                                    />
+                            </MuiPickersUtilsProvider>
+                        </div>
+                    </Form.Field>
+                    <Message
+                        warning
+                        header='Importante'
+                        content="Si no sale el horario específico que buscas para este día, es porque no hay asistentes inscritos aún en ese horario."
+                        visible
+                    />
+                    {this.state.eucaristias.length > 0 && <Form.Field>
+                        <Button.Group basic vertical fluid>
+                            {this.state.eucaristias.map(res => {
+                                return(
+                                    <Button key={res.hora}
+                                    icon='download' 
+                                    labelPosition='right' 
+                                    content={res.hora}
+                                    onClick={()=>{this.downloadPdf(res)}}
+                                    />
+                                )
+                            })}
+                        </Button.Group>
+                    </Form.Field>}
+                    <Button.Group>
+                        <Button
+                        negative
+                        icon='arrow circle left'
+                        labelPosition='left'
+                        content='Volver'
+                        onClick={this.close}
                         />
                     </Button.Group>
                 </Form>}

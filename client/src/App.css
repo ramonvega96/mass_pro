@@ -4,7 +4,7 @@
 
 .ui.cards {
   justify-content: center;
-  margin: .875em -.5em !important;
+  margin: 0px 0px 0px 0px  !important;
 }
 
 .ui.input {
@@ -15,6 +15,11 @@
 .ui.steps {
   width: 100%;
   margin: 0px !important;
+}
+
+#date-picker-dialog{
+  border: 0px;
+  text-align: center;
 }
 
 .ui.positive.button {
@@ -39,4 +44,8 @@
   padding: 20px;
   height: 60px;
   width: 100%;
+}
+
+.ui.horizontal.celled.list {
+  margin-top: 15px;
 }
