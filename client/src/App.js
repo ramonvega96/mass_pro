@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import { Parroquias } from './components/Parroquias';
 import { Input } from 'semantic-ui-react'
 import ModalParroquia from './components/ModalParroquia';
+import Parroquias from './components/Parroquias';
+import ModalMisReservas from './components/ModalMisReservas';
 
 
 function App() {
@@ -25,8 +26,10 @@ function App() {
 
   function refreshOnEdit(newParroquia){
     const parroquia = { 
-      nombre: newParroquia.newNombre, 
-      nit: newParroquia.newNit, 
+      nombre: newParroquia.newNombre,
+      diocesis: newParroquia.newDiocesis,
+      ubicacion: newParroquia.newUbicacion,
+      nit: newParroquia.nit, 
       parroco: newParroquia.newParroco, 
       capacidad: newParroquia.newCapacidad, 
       password: newParroquia.newPassword, 
@@ -55,7 +58,10 @@ function App() {
   }
   
   return <div className="App" >
-    <Input fluid icon='search' placeholder='Busca tu parroquia por su nombre!' onChange={e => setFilteredValues(e.target.value)}/>
+    <div>
+      <Input fluid icon='search' placeholder='Busca tu parroquia por su nombre!' onChange={e => setFilteredValues(e.target.value)}/>
+      <ModalMisReservas positive />
+    </div>
     <Parroquias parroquias={filteredParroquias}/>
     <Footer>
       <ModalParroquia onNewParroquia={p => refreshOnAdd(p)} onParroquiaChange={p => refreshOnEdit(p)}/>
