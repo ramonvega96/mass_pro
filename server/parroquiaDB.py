@@ -41,7 +41,8 @@ def editarParroquia(newParroquia):
                 "capacidad": newParroquia.get("newCapacidad"),
                 "password": newParroquia.get("newPassword"),
                 "direccion": newParroquia.get("newDireccion"),
-                "telefono": newParroquia.get("newTelefono")
+                "telefono": newParroquia.get("newTelefono"),
+                "autoEvalCovid": newParroquia.get("newAutoEvalCovid")
             }
         }
     )
