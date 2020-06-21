@@ -121,7 +121,7 @@ export default class ModalMisReservas extends Component {
                   else{
                     result.reservas.forEach(r => {                      
                       var parroquia = resp.parroquias.find(obj => {return obj.nit === r.id.split(":")[3]});
-                      r.fecha = new Date(r.year, r.mes, r.dia, parseInt(r.id.split(":")[0])/100);
+                      r.fecha = new Date(r.year, r.mes, r.dia, Math.floor(parseInt(r.id.split(":")[0])/100), r.id.split(":")[0].endsWith("30") ? 30 : 0);
                       r.parroquia = parroquia.nombre
                       r.direccion = parroquia.direccion
                       r.ubicacion = parroquia.ubicacion

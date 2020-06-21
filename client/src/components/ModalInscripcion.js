@@ -354,12 +354,13 @@ export default class ModalInscripcion extends Component {
     }
 
     const horarioDisponible = (h) => {
-      let theHour = parseInt(h.split(":")[0])/100;
+      let theMinutes = h.split(":")[0].endsWith("30") ? 30 : 0;
+      let theHour = Math.floor(parseInt(h.split(":")[0])/100);
       let theDay = this.state.semanas.find(obj => {return obj.value === this.state.selectedWeek}).initDay + dias.find(obj => {return obj.value === h.split(":")[1]}).key;
       let theMonth = this.state.semanas.find(obj => {return obj.value === this.state.selectedWeek}).initMonth - 1;
       let theYear = this.state.semanas.find(obj => {return obj.value === this.state.selectedWeek}).initYear;
       
-      var hEucaristia = new Date(theYear, theMonth, theDay, theHour);
+      var hEucaristia = new Date(theYear, theMonth, theDay, theHour, theMinutes);
       
       if(hEucaristia < new Date() || cuposDisponibles(h) < 1){
         return true;
