@@ -126,9 +126,19 @@ export default class ModalInscripcion extends Component {
         value: '600'
       },
       {
+          key: '630',
+          text: '06:30 a.m',
+          value: '630'
+      },
+      {
         key: '700',
         text: '07:00 a.m',
         value: '700'
+      },
+      {
+          key: '730',
+          text: '07:30 a.m',
+          value: '730'
       },
       {
           key: '800',
@@ -136,9 +146,19 @@ export default class ModalInscripcion extends Component {
           value: '800'
       },
       {
+          key: '830',
+          text: '08:30 a.m',
+          value: '830'
+      },
+      {
           key: '900',
           text: '09:00 a.m',
           value: '900'
+      },
+      {
+          key: '930',
+          text: '09:30 a.m',
+          value: '930'
       },
       {
           key: '1000',
@@ -146,9 +166,19 @@ export default class ModalInscripcion extends Component {
           value: '1000'
       },
       {
+          key: '1030',
+          text: '10:30 a.m',
+          value: '1030'
+      },
+      {
           key: '1100',
           text: '11:00 a.m',
           value: '1100'
+      },
+      {
+          key: '1130',
+          text: '11:30 a.m',
+          value: '1130'
       }
     ];
 
@@ -159,9 +189,19 @@ export default class ModalInscripcion extends Component {
         value: '1200'
       },
       {
+          key: '1230',
+          text: '12:30 p.m',
+          value: '1200'
+      },
+      {
         key: '1300',
         text: '01:00 p.m',
         value: '1300'
+      },
+      {
+          key: '1330',
+          text: '01:30 p.m',
+          value: '1330'
       },
       {
           key: '1400',
@@ -169,9 +209,19 @@ export default class ModalInscripcion extends Component {
           value: '1400'
       },
       {
+          key: '1430',
+          text: '02:30 p.m',
+          value: '1430'
+      },
+      {
           key: '1500',
           text: '03:00 p.m',
           value: '1500'
+      },
+      {
+          key: '1530',
+          text: '03:30 p.m',
+          value: '1530'
       },
       {
           key: '1600',
@@ -179,15 +229,40 @@ export default class ModalInscripcion extends Component {
           value: '1600'
       },
       {
+          key: '1630',
+          text: '04:30 p.m',
+          value: '1630'
+      },
+      {
           key: '1700',
           text: '05:00 p.m',
           value: '1700'
       },
       {
+          key: '1730',
+          text: '05:30 p.m',
+          value: '1730'
+      },
+      {
           key: '1800',
           text: '06:00 p.m',
           value: '1800'
-      }
+      },
+      {
+          key: '1830',
+          text: '06:30 p.m',
+          value: '1830'
+      },
+      {
+          key: '1900',
+          text: '07:00 p.m',
+          value: '1900'
+      },
+      {
+          key: '1930',
+          text: '07:30 p.m',
+          value: '1930'
+      },
     ];
 
     const dias = [
