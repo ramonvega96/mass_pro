@@ -410,7 +410,7 @@ export default class ModalMisReservas extends Component {
                             <Card key={res.id}>
                                 <Card.Content>
                                     <Card.Header>
-                                      {res.fecha.getDate() + " de " + months[res.fecha.getMonth()] + " de " + res.fecha.getFullYear()} <br/>
+                                      {res.id.split(":")[1].charAt(0).toUpperCase() + res.id.split(":")[1].slice(1) + ", " + res.fecha.getDate() + " de " + months[res.fecha.getMonth()] + " de " + res.fecha.getFullYear()} <br/>
                                       {res.hora}                                        
                                     </Card.Header>
                                     <br/>
