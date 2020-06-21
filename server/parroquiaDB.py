@@ -41,7 +41,8 @@ def editarParroquia(newParroquia):
                 "capacidad": newParroquia.get("newCapacidad"),
                 "password": newParroquia.get("newPassword"),
                 "direccion": newParroquia.get("newDireccion"),
-                "telefono": newParroquia.get("newTelefono")
+                "telefono": newParroquia.get("newTelefono"),
+                "autoEvalCovid": newParroquia.get("newAutoEvalCovid")
             }
         }
     )
@@ -145,3 +146,18 @@ def getHorarioParroquia(data):
     horario = horarios.find_one( { "nit": data } )
     del horario["_id"]
     return horario
+
+def getParroquiasWithIds(ids):
+    parroquiasList = []
+    
+    for i in ids:
+        parroquia = parroquias.find_one( { "nit": i } )
+        del parroquia["_id"]
+        parroquiasList.append(parroquia)
+    
+    obj = {
+        "parroquias": parroquiasList
+    }
+    
+    return obj
+

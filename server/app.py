@@ -96,4 +96,16 @@ def getEucaristiasPorDia():
     NBData = request.get_json()
     return eucaristiaDB.getEucaristiasPorDia(NBData)
 
+@app.route('/getParroquiasWithIds', methods = ['POST'])
+def getParroquiasWithIds():
+    # Get eucaristias para un usuario especifico - sus reservas
+    NBData = request.get_json()
+    return parroquiaDB.getParroquiasWithIds(NBData)
+
+@app.route('/postUserCovidForm', methods = ['POST'])
+def postUserCovidForm():
+    # Get eucaristias para un usuario especifico - sus reservas
+    NBData = request.get_json()
+    return eucaristiaDB.postUserCovidForm(NBData)
+
 app.run()

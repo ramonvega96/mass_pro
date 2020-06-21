@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Modal, Form, Icon, Step, List, Message } from 'semantic-ui-react'
+import { Button, Modal, Form, Icon, Step, List, Message, Checkbox } from 'semantic-ui-react'
 import jsPDF from 'jspdf';
 import "jspdf-autotable";
 
@@ -41,7 +41,8 @@ export default class ModalParroquia extends Component {
             hDomPm: [],
 
             selectedDate: new Date(),
-            eucaristias: []
+            eucaristias: [],
+            autoEvalCovid: false
         }
     }
 
@@ -62,7 +63,7 @@ export default class ModalParroquia extends Component {
 
         const title = "Lista de Asistencia - " + this.state.nombre;
         
-        const months = ["Enero", "Febrero", "Marzo","Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         const fecha = this.state.selectedDate.getDate() + " de " + months[this.state.selectedDate.getMonth()] + " de " + this.state.selectedDate.getFullYear();
         const hora = e.hora;
         
@@ -108,6 +109,7 @@ export default class ModalParroquia extends Component {
         cPassword: "",
         diocesis: "",
         ubicacion: "",
+        autoEvalCovid: false,
 
         selectedDate: new Date(),
         eucaristias: [],
@@ -405,13 +407,23 @@ export default class ModalParroquia extends Component {
                             onChange={e => this.setState({ capacidad: e.target.value }, () => this.checkDataParroquia())}
                             value={this.state.capacidad}/>
                     </Form.Field>
-                    <Form.Field required>
-                        <label>Nit de la Parroquia</label>
-                        <input 
-                            placeholder='Nit Parroquia (sin puntos, guiones o espacios)' 
-                            onChange={e => this.setState({ nit: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.nit}/>
-                    </Form.Field>
+                    <Form.Group widths='equal'>
+                        <Form.Field required>
+                            <label>Nit de la Parroquia</label>
+                            <input 
+                                placeholder='Nit Parroquia (sin puntos, guiones o espacios)' 
+                                onChange={e => this.setState({ nit: e.target.value }, () => this.checkDataParroquia())}
+                                value={this.state.nit}/>
+                        </Form.Field>
+                        <Form.Field>
+                            <label id='auto-eval-covid'>¿Habilitar autoevaluación COVID?</label>
+                            <Checkbox 
+                                label='Si, habilitar autoevaluación COVID'
+                                checked={this.state.autoEvalCovid}
+                                onChange={() => this.setState({ autoEvalCovid: !this.state.autoEvalCovid })} 
+                                />
+                        </Form.Field>
+                    </Form.Group>
                     <Form.Group widths='equal'>
                         <Form.Field required>
                             <label>Contraseña</label>
@@ -646,7 +658,8 @@ export default class ModalParroquia extends Component {
                                 capacidad: this.state.capacidad, 
                                 password: this.state.password, 
                                 direccion: this.state.direccion,
-                                telefono: this.state.telefono
+                                telefono: this.state.telefono,
+                                autoEvalCovid: this.state.autoEvalCovid
                             };
 
                             const horario = { 
@@ -815,6 +828,7 @@ export default class ModalParroquia extends Component {
                                             capacidad: data.parroquia.capacidad,
                                             direccion: data.parroquia.direccion,
                                             telefono: data.parroquia.telefono,
+                                            autoEvalCovid: data.parroquia.autoEvalCovid,
                                             hLunAm: data.horario.horario.lunAm,
                                             hLunPm: data.horario.horario.lunPm,
                                             hMarAm: data.horario.horario.marAm,
@@ -888,13 +902,23 @@ export default class ModalParroquia extends Component {
                             onChange={e => this.setState({ capacidad: e.target.value }, () => this.checkDataParroquia())}
                             value={this.state.capacidad}/>
                     </Form.Field>
-                    <Form.Field required>
-                        <label>Nit de la Parroquia</label>
-                        <input 
-                            placeholder='Nit Parroquia (sin puntos, guiones o espacios)'
-                            disabled={true}
-                            value={this.state.nit}/>
-                    </Form.Field>
+                    <Form.Group widths='equal'>
+                        <Form.Field required>
+                            <label>Nit de la Parroquia</label>
+                            <input 
+                                placeholder='Nit Parroquia (sin puntos, guiones o espacios)'
+                                disabled={true}
+                                value={this.state.nit}/>
+                        </Form.Field>
+                        <Form.Field>
+                            <label id='auto-eval-covid'>¿Habilitar autoevaluación COVID?</label>
+                            <Checkbox 
+                                label='Si, habilitar autoevaluación COVID'
+                                checked={this.state.autoEvalCovid}
+                                onChange={() => this.setState({ autoEvalCovid: !this.state.autoEvalCovid })} 
+                                />
+                        </Form.Field>
+                    </Form.Group>
                     <Form.Group widths='equal'>
                         <Form.Field required>
                             <label>Contraseña</label>
@@ -1128,7 +1152,8 @@ export default class ModalParroquia extends Component {
                                 newCapacidad: this.state.capacidad, 
                                 newPassword: this.state.password, 
                                 newDireccion: this.state.direccion,
-                                newTelefono: this.state.telefono
+                                newTelefono: this.state.telefono,
+                                newAutoEvalCovid: this.state.autoEvalCovid
                             };
 
                             const horario = { 
@@ -1278,6 +1303,7 @@ export default class ModalParroquia extends Component {
                                             capacidad: data.parroquia.capacidad,
                                             direccion: data.parroquia.direccion,
                                             telefono: data.parroquia.telefono,
+                                            autoEvalCovid: data.parroquia.autoEvalCovid,
                                             hLunAm: data.horario.horario.lunAm,
                                             hLunPm: data.horario.horario.lunPm,
                                             hMarAm: data.horario.horario.marAm,
