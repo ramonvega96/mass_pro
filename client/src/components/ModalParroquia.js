@@ -1331,7 +1331,7 @@ export default class ModalParroquia extends Component {
                     
                     {this.state.errorGetInscritos && <Message
                         error
-                        header='Error'
+                        header='Importante'
                         content={this.state.errorGetInscritos}
                         visible
                     />}
