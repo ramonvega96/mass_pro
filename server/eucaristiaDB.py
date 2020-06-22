@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import json
 import datetime
+import random
 
 # establecer conexion
 conn = MongoClient('localhost', 27017)
@@ -200,7 +201,8 @@ def crearInscripcion(data):
                 "dia": semana.get("initDay") + next((x.get('value') for x in dias if x.get('key') == i.split(":")[1]), None),
                 "mes": semana.get("initMonth") - 1,
                 "year": semana.get("initYear"),
-                "cupos": int(parroquia.get("capacidad")) - 1
+                "cupos": int(parroquia.get("capacidad")) - 1,
+                "available": True
             }
             
             eucaristias_db.insert(obj)
@@ -306,7 +308,6 @@ def getEucaristiasPorDia(data):
   lista = []
   for i in eucaristias:
       del i["_id"]
-      del i["id"]
       del i["dia"]
       del i["mes"]
       del i["year"]
@@ -342,22 +343,10 @@ def postUserCovidForm(data):
     return eucaristia
 
 def registrarIngreso(data):
-  dayTs = data.get("fecha")
-  horario = data.get("horario")
-  parroquiaId = data.get("parroquiaId")
   userId = data.get("userId")
   temperatura = data.get("temperatura")
-
-  weekdayKey = datetime.datetime.fromtimestamp(dayTs).weekday() + 1 if datetime.datetime.fromtimestamp(dayTs).weekday() != 6 else 0
-  weekdayName = next((x.get('key') for x in dias if x.get('value') == weekdayKey), None)
-
-  week = semanas.find_one( {"$and":[ 
-        { "initTs": { "$lte": dayTs } }, 
-        { "endTs": { "$gte": dayTs } }
-        ]})
+  eucaristiaId = data.get("eucaristiaId")
   
-
-  eucaristiaId = str(horario) + ":" + weekdayName + ":" + week.get("value") + ":" + parroquiaId
   eucaristia = eucaristias_db.find_one( { "id": eucaristiaId } )
   asistentes = eucaristia.get("asistentes")
   covidForm = {}
@@ -378,3 +367,34 @@ def registrarIngreso(data):
       )
 
   return {"asistentes": asistentes}
+
+def generarColabCode(data):
+  eucaristiaId = data.get("eucaristiaId")
+  code = random.randint(100000, 999999)
+
+  eucaristias = eucaristias_db.find( {"$and": [{ "colabCode": code }, { "available": True }]} )
+
+  if eucaristias.count() > 0:
+    return {"error": "No se pudo generar el código. Vuelva a intentarlo"}
+
+  eucaristias_db.update(
+          {"id": eucaristiaId},
+          {"$set": 
+              {
+                  "colabCode": code
+              }
+          }
+      )
+  
+  return {"colabCode": code}  
+
+def getEucaristiaColaborador(data):
+  code = data.get("colabCode")
+  eucaristia = eucaristias_db.find_one( {"$and": [{ "colabCode": code }, { "available": True }]} )
+
+  if eucaristia is None:
+    return {"error": "Código incorrecto. El código ingresado no existe"}
+
+  
+  del eucaristia["_id"]
+  return eucaristia

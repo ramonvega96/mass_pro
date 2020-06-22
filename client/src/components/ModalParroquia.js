@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Modal, Form, Icon, Step, List, Message, Checkbox, Tab, Table } from 'semantic-ui-react'
+import { Button, Modal, Form, Icon, Step, List, Message, Checkbox, Tab, Table, Divider } from 'semantic-ui-react'
 import jsPDF from 'jspdf';
 import "jspdf-autotable";
 
@@ -45,7 +45,7 @@ export default class ModalParroquia extends Component {
 
     showInscribir = () => this.setState({ openInscribir: true, size: 'small' })
     showEditar = () => this.setState({ openEditar: true, size: 'mini' })
-    showDownloadList = () => this.setState({ openDownloadList: true, size: 'mini' })    
+    showDownloadList = () => this.setState({ openDownloadList: true, size: 'mini', soyColaborador: false })    
     backToFirstStep = () => this.setState({ step: 1, errorCreando: "" })    
     
     downloadPdf = (e) => {     
@@ -124,7 +124,9 @@ export default class ModalParroquia extends Component {
         hSabAm: [],
         hSabPm: [],
         hDomAm: [],
-        hDomPm: []
+        hDomPm: [],
+
+        codigoColaborador: ""
     });
   
   
@@ -412,6 +414,7 @@ export default class ModalParroquia extends Component {
                         this.setState({ 
                             errorGetInscritos: "",
                             eucaristias: resp.eucaristias,
+                            selectedEucaristia: resp.eucaristias.find(obj => {return obj.value === selectedHorario}),
                             asistentesEucaristia: resp.eucaristias.find(obj => {return obj.value === selectedHorario}).asistentes,
                             selectedHorario: selectedHorario,
                             asistente: resp.eucaristias.find(obj => {return obj.value === selectedHorario}).asistentes.find(obj => {return obj.id === asistenteId}),
@@ -422,6 +425,7 @@ export default class ModalParroquia extends Component {
                         this.setState({ 
                             errorGetInscritos: "",
                             eucaristias: resp.eucaristias,
+                            selectedEucaristia: resp.eucaristias.find(obj => {return obj.value === selectedHorario}),
                             asistentesEucaristia: resp.eucaristias.find(obj => {return obj.value === selectedHorario}).asistentes,
                             selectedHorario: selectedHorario,
                             asistente: "",
@@ -448,6 +452,7 @@ export default class ModalParroquia extends Component {
 
       const handleChangeEucaristia = (e, {value}) => {
         this.setState({
+            selectedEucaristia: this.state.eucaristias.find(obj => {return obj.value === value}),
             asistentesEucaristia: this.state.eucaristias.find(obj => {return obj.value === value}).asistentes,
             selectedHorario: value,
             asistenteId: "",
@@ -553,6 +558,53 @@ export default class ModalParroquia extends Component {
                     onChange={handleChangeEucaristia.bind(this)}/>
             </Form.Field>}
 
+            {this.state.selectedHorario && <Form.Field>
+                {this.state.selectedEucaristia && !this.state.selectedEucaristia.colabCode && <Button            
+                    color='teal'
+                    icon='barcode'
+                    labelPosition='left'
+                    content={this.state.errorGenColabCode ? this.state.errorGenColabCode :'Generar Código Colaboradores'}
+                    onClick={() => {
+                        const dataColabCode = {
+                            eucaristiaId: this.state.selectedEucaristia.id
+                        }
+
+                        let errorMsg = ""                        
+                        
+                        fetch("/generarColabCode", {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(dataColabCode)
+                          }).then(resp =>
+                            resp.json().then(data => {
+                                  if(!resp.ok){
+                                      errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                      this.setState({ errorRegistroIngreso: errorMsg });
+                                  }
+                                  else if (data.error){
+                                    errorMsg = data.error;
+                                    this.setState({ errorGenColabCode: errorMsg });
+                                  }
+                                  else{
+                                    handleDateChange(this.state.selectedDate, this.state.selectedHorario, "");
+                                    this.setState({ errorGenColabCode: "" });
+                                  }
+                              })
+                        );
+                    }}
+                    />}
+
+                    {this.state.selectedEucaristia && this.state.selectedEucaristia.colabCode && <Button            
+                        color='teal'
+                        icon='barcode'
+                        labelPosition='left'
+                        content={'Comparta este código con los colaboradores de la parroquia: '+ this.state.selectedEucaristia.colabCode}
+                        disabled
+                        />}
+            </Form.Field>}
+
         {this.state.eucaristias.length > 0 && <Form.Field required>
             <label>Cédula o Tarjeta de Identidad</label>
             <input
@@ -611,11 +663,9 @@ export default class ModalParroquia extends Component {
                 onClick={() => {
                     
                     const dataIngreso = {
-                        fecha: this.state.selectedDate.getTime()/1000,
-                        horario: this.state.selectedHorario,
-                        parroquiaId: this.state.nit,
                         userId: this.state.asistenteId,
-                        temperatura: this.state.temperatura
+                        temperatura: this.state.temperatura,
+                        eucaristiaId: this.state.selectedEucaristia.id
                     };
 
                     let errorMsg = "";
@@ -648,6 +698,170 @@ export default class ModalParroquia extends Component {
                 onClick={() => handleDateChange(this.state.selectedDate, this.state.selectedHorario, this.state.asistenteId)}
                 />}
 
+    </Form>
+    
+    const asistenciaColab = <Form>
+
+        <Form.Field required>
+            <label>Cédula o Tarjeta de Identidad</label>
+            <input
+                placeholder='Identificación (sin puntos ni espacios)'
+                value={this.state.asistenteId} 
+                onChange={e => {lookForAsistente(e.target.value)}}
+                />
+        </Form.Field>
+
+        {this.state.asistente && !this.state.asistente.covidForm && <Message
+                warning
+                header='Importante'
+                content='Aún no registra autoevaluación. El asistente debe llenarla para registrar el ingreso.'
+                visible
+        />}
+
+        {this.state.asistente && <Form.Field>
+            <Table celled >
+                <Table.Header>
+                <Table.Row>
+                    <Table.HeaderCell>Nombre</Table.HeaderCell>
+                    <Table.HeaderCell>Autoevaluación</Table.HeaderCell>
+                    <Table.HeaderCell>Temperatura (ºC)</Table.HeaderCell>
+                </Table.Row>
+                </Table.Header>
+
+                <Table.Body>
+                <Table.Row>
+                    <Table.Cell>{this.state.asistente.nombre}</Table.Cell>
+                    <Table.Cell>
+                        <Icon name={this.state.asistente.covidForm ? "check" : "close"} color={this.state.asistente.covidForm ? "green" : "red"}/>
+                    </Table.Cell>
+                    <Table.Cell>
+                        <input 
+                        disabled={this.state.asistente.covidForm ? false : true} 
+                        onChange={e => handleChangeTemperatura(e.target.value)}
+                        />
+                    </Table.Cell>
+                </Table.Row>
+                </Table.Body>
+            </Table>
+        </Form.Field>}
+
+        {this.state.asistente && this.state.asistente.covidForm && this.state.asistente.covidForm.p14 && <Message
+                warning
+                header='Importante'
+                content='Ya se registró el ingreso de este usuario. Si desea corregir su temperatura vuelva a enviar este formulario.'
+                visible
+        />}
+
+        {this.state.temperatura && <Button            
+                positive
+                icon='save outline'
+                labelPosition='right'
+                content='Registrar Ingreso'
+                onClick={() => {
+                    
+                    const dataIngreso = {
+                        userId: this.state.asistenteId,
+                        temperatura: this.state.temperatura,
+                        eucaristiaId: this.state.selectedEucaristia.id
+                    };
+
+                    let errorMsg = "";
+
+                    fetch("/registrarIngreso", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(dataIngreso)
+                      }).then(resp =>
+                        resp.json().then(() => {
+                              if(!resp.ok){
+                                  errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                  this.setState({ errorRegistroIngreso: errorMsg });
+                              }
+                              else{
+
+                                const colabCode = {
+                                    colabCode : parseInt(this.state.codigoColaborador)
+                                }
+
+                                let errorMsg = "";
+
+                                fetch("/getEucaristiaColaborador", {
+                                    method: "POST",
+                                    headers: {
+                                      "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify(colabCode)
+                                  }).then(resp =>
+                                    resp.json().then(data => {
+                                          if(!resp.ok){
+                                              errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                              this.setState({ errorColabCodeEucaristia: errorMsg });
+                                          }
+                                          else if (data.error){
+                                            errorMsg = data.error;
+                                            this.setState({ errorColabCodeEucaristia: errorMsg });
+                                          }
+                                          else{
+                                            this.setState({ 
+                                                errorColabCodeEucaristia: "", 
+                                                selectedEucaristia: data,
+                                                asistentesEucaristia: data.asistentes,
+                                                asistenteId: "",
+                                                asistente: "", 
+                                                temperatura: ""
+                                            });
+                                          }
+                                      })
+                                );
+                              }
+                          })
+                    );
+                }}
+            />}
+        
+        {this.state.asistente && !this.state.asistente.covidForm && <Button            
+                color='yellow'
+                icon='redo'
+                labelPosition='right'
+                content='Refrescar datos'
+                onClick={() => {
+                    const colabCode = {
+                        colabCode : parseInt(this.state.codigoColaborador)
+                    }
+
+                    let errorMsg = "";
+
+                    fetch("/getEucaristiaColaborador", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(colabCode)
+                      }).then(resp =>
+                        resp.json().then(data => {
+                              if(!resp.ok){
+                                  errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                  this.setState({ errorColabCodeEucaristia: errorMsg });
+                              }
+                              else if (data.error){
+                                errorMsg = data.error;
+                                this.setState({ errorColabCodeEucaristia: errorMsg });
+                              }
+                              else{
+                                this.setState({ 
+                                    errorColabCodeEucaristia: "", 
+                                    selectedEucaristia: data,
+                                    asistentesEucaristia: data.asistentes,
+                                    asistente: data.asistentes.find(obj => {return obj.id === this.state.asistenteId})
+                                });
+                              }
+                          })
+                    );
+                }}
+                />}
+
     </Form>  
 
       const panesBio = [
@@ -664,6 +878,16 @@ export default class ModalParroquia extends Component {
             key: 'tab2',
             content: reportes
           }
+        }
+      ];
+
+      const panesBioColab = [
+        {
+          menuItem: 'Tomar asistencia',
+          pane: { 
+              key: 'tab1', 
+              content: asistenciaColab
+            }
         }
       ];
 
@@ -1677,11 +1901,89 @@ export default class ModalParroquia extends Component {
                         }}
                         />
                     </Button.Group>
+                    <Divider />
+                    <Form.Field>
+                        <Button  fluid          
+                            color='teal'
+                            icon='hand point up'
+                            labelPosition='left'
+                            content='Soy Colaborador'
+                            onClick={() => this.setState({soyColaborador: !this.state.soyColaborador})}
+                        />
+                    </Form.Field>
+                    
+                    {this.state.soyColaborador && <Form.Field required>
+                        <label>Código colaborador</label>
+                        <input
+                            placeholder='Código colaborador' 
+                            onChange={e => this.setState({ codigoColaborador: e.target.value })}
+                            value={this.state.codigoColaborador}/>
+                    </Form.Field>}
+
+                    {this.state.soyColaborador && this.state.codigoColaborador && <Form.Field>
+                        <Button  fluid          
+                            color='green'
+                            icon='eye'
+                            labelPosition='left'
+                            content='Validar Código'
+                            onClick={() => {
+                                if(!isNaN(this.state.codigoColaborador)){
+                                    const colabCode = {
+                                        colabCode : parseInt(this.state.codigoColaborador)
+                                    }
+    
+                                    let errorMsg = "";
+    
+                                    fetch("/getEucaristiaColaborador", {
+                                        method: "POST",
+                                        headers: {
+                                          "Content-Type": "application/json"
+                                        },
+                                        body: JSON.stringify(colabCode)
+                                      }).then(resp =>
+                                        resp.json().then(data => {
+                                              if(!resp.ok){
+                                                  errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                                  this.setState({ errorColabCodeEucaristia: errorMsg });
+                                              }
+                                              else if (data.error){
+                                                errorMsg = data.error;
+                                                this.setState({ errorColabCodeEucaristia: errorMsg });
+                                              }
+                                              else{
+                                                this.setState({ 
+                                                    errorColabCodeEucaristia: "", 
+                                                    step: 2,
+                                                    size: "small",
+                                                    selectedEucaristia: data,
+                                                    asistentesEucaristia: data.asistentes 
+                                                });
+                                              }
+                                          })
+                                    );
+                                }                                
+                            }}
+                        />
+                    </Form.Field>}
+
+                    {this.state.errorColabCodeEucaristia && <Message
+                        error
+                        header='Error en la autenticación'
+                        content={this.state.errorColabCodeEucaristia}
+                        visible
+                    />} 
+
                 </Form>}
 
-                {this.state.step === 2 && <div>
+                {this.state.step === 2 && !this.state.codigoColaborador && <div>
                     
                     <Tab panes={this.state.autoEvalCovid ? panesBio : panesNoBio} renderActiveOnly={false}/>
+                    
+                </div>}
+
+                {this.state.step === 2 && this.state.codigoColaborador && <div>
+                    
+                    <Tab panes={panesBioColab} renderActiveOnly={false}/>
                     
                 </div>}
             </Modal.Content>
