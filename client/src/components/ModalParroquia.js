@@ -605,7 +605,7 @@ export default class ModalParroquia extends Component {
                         />}
             </Form.Field>}
 
-        {this.state.eucaristias.length > 0 && <Form.Field required>
+        {this.state.eucaristias.length > 0 && this.state.selectedEucaristia &&<Form.Field required>
             <label>Cédula o Tarjeta de Identidad</label>
             <input
                 placeholder='Identificación (sin puntos ni espacios)'
@@ -691,6 +691,14 @@ export default class ModalParroquia extends Component {
             />}
         
         {this.state.asistente && !this.state.asistente.covidForm && <Button            
+                color='yellow'
+                icon='redo'
+                labelPosition='right'
+                content='Refrescar datos'
+                onClick={() => handleDateChange(this.state.selectedDate, this.state.selectedHorario, this.state.asistenteId)}
+                />}
+
+        {!this.state.asistente && <Button            
                 color='yellow'
                 icon='redo'
                 labelPosition='right'
@@ -862,6 +870,47 @@ export default class ModalParroquia extends Component {
                 }}
                 />}
 
+            {!this.state.asistente && <Button            
+                color='yellow'
+                icon='redo'
+                labelPosition='right'
+                content='Refrescar datos'
+                onClick={() => {
+                    const colabCode = {
+                        colabCode : parseInt(this.state.codigoColaborador)
+                    }
+
+                    let errorMsg = "";
+
+                    fetch("/getEucaristiaColaborador", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(colabCode)
+                      }).then(resp =>
+                        resp.json().then(data => {
+                              if(!resp.ok){
+                                  errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                  this.setState({ errorColabCodeEucaristia: errorMsg });
+                              }
+                              else if (data.error){
+                                errorMsg = data.error;
+                                this.setState({ errorColabCodeEucaristia: errorMsg });
+                              }
+                              else{
+                                this.setState({ 
+                                    errorColabCodeEucaristia: "", 
+                                    selectedEucaristia: data,
+                                    asistentesEucaristia: data.asistentes,
+                                    asistente: data.asistentes.find(obj => {return obj.id === this.state.asistenteId})
+                                });
+                              }
+                          })
+                    );
+                }}
+            />}
+
     </Form>  
 
       const panesBio = [
@@ -893,7 +942,7 @@ export default class ModalParroquia extends Component {
 
       const panesNoBio = [
         {
-          menuItem: 'Descargar reportes',
+          menuItem: 'Descargar listas',
           pane: {
             key: 'tab1',
             content: reportes
