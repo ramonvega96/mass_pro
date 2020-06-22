@@ -362,7 +362,7 @@ export default class ModalInscripcion extends Component {
       
       var hEucaristia = new Date(theYear, theMonth, theDay, theHour, theMinutes);
       
-      if(hEucaristia < new Date() || cuposDisponibles(h) < 1){
+      if(new Date(hEucaristia.getTime() + 30 * 60000) < new Date() || cuposDisponibles(h) < 1){
         return true;
       }
       
