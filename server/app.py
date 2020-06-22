@@ -86,26 +86,32 @@ def getSemanas():
 
 @app.route('/deleteReserva', methods = ['PATCH'])
 def deleteReserva():
-    # Get eucaristias para un usuario especifico - sus reservas
     NBData = request.get_json()
     return eucaristiaDB.deleteReserva(NBData)
 
 @app.route('/getEucaristiasPorDia', methods = ['POST'])
 def getEucaristiasPorDia():
-    # Get eucaristias para un usuario especifico - sus reservas
     NBData = request.get_json()
     return eucaristiaDB.getEucaristiasPorDia(NBData)
 
 @app.route('/getParroquiasWithIds', methods = ['POST'])
 def getParroquiasWithIds():
-    # Get eucaristias para un usuario especifico - sus reservas
     NBData = request.get_json()
     return parroquiaDB.getParroquiasWithIds(NBData)
 
 @app.route('/postUserCovidForm', methods = ['POST'])
 def postUserCovidForm():
-    # Get eucaristias para un usuario especifico - sus reservas
     NBData = request.get_json()
     return eucaristiaDB.postUserCovidForm(NBData)
+
+@app.route('/getSemana', methods = ['POST'])
+def getSemana():
+    NBData = request.get_json()
+    return semanaDB.getSemana(NBData)
+
+@app.route('/registrarIngreso', methods = ['POST'])
+def registrarIngreso():
+    NBData = request.get_json()
+    return eucaristiaDB.registrarIngreso(NBData)
 
 app.run()

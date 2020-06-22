@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import json
+import datetime
 
 # establecer conexion
 conn = MongoClient('localhost', 27017)
@@ -339,3 +340,41 @@ def postUserCovidForm(data):
 
     del eucaristia["_id"]
     return eucaristia
+
+def registrarIngreso(data):
+  dayTs = data.get("fecha")
+  horario = data.get("horario")
+  parroquiaId = data.get("parroquiaId")
+  userId = data.get("userId")
+  temperatura = data.get("temperatura")
+
+  weekdayKey = datetime.datetime.fromtimestamp(dayTs).weekday() + 1 if datetime.datetime.fromtimestamp(dayTs).weekday() != 6 else 0
+  weekdayName = next((x.get('key') for x in dias if x.get('value') == weekdayKey), None)
+
+  week = semanas.find_one( {"$and":[ 
+        { "initTs": { "$lte": dayTs } }, 
+        { "endTs": { "$gte": dayTs } }
+        ]})
+  
+
+  eucaristiaId = str(horario) + ":" + weekdayName + ":" + week.get("value") + ":" + parroquiaId
+  eucaristia = eucaristias_db.find_one( { "id": eucaristiaId } )
+  asistentes = eucaristia.get("asistentes")
+  covidForm = {}
+
+  for i in asistentes:
+      if i.get("id") == userId:
+          covidForm = i.get("covidForm")
+          covidForm["p14"] = "temperatura:" + str(temperatura)
+          i["covidForm"] = covidForm
+
+  eucaristias_db.update(
+          {"id": eucaristiaId},
+          {"$set": 
+              {
+                  "asistentes": asistentes
+              }
+          }
+      )
+
+  return {"asistentes": asistentes}

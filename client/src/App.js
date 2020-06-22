@@ -58,10 +58,8 @@ function App() {
   }
   
   return <div className="App" >
-    <div>
-      <Input fluid icon='search' placeholder='Busca tu parroquia por su nombre!' onChange={e => setFilteredValues(e.target.value)}/>
-      <ModalMisReservas positive />
-    </div>
+    <Input fluid icon='search' placeholder='Busca tu parroquia por su nombre!' onChange={e => setFilteredValues(e.target.value)}/>
+    <ModalMisReservas />
     <Parroquias parroquias={filteredParroquias}/>
     <Footer>
       <ModalParroquia onNewParroquia={p => refreshOnAdd(p)} onParroquiaChange={p => refreshOnEdit(p)}/>

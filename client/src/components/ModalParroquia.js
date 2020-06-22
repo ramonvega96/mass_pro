@@ -1,14 +1,11 @@
 import React, { Component } from 'react'
-import { Button, Modal, Form, Icon, Step, List, Message, Checkbox } from 'semantic-ui-react'
+import { Button, Modal, Form, Icon, Step, List, Message, Checkbox, Tab, Table } from 'semantic-ui-react'
 import jsPDF from 'jspdf';
 import "jspdf-autotable";
 
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-} from '@material-ui/pickers';
+import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 
 export default class ModalParroquia extends Component {
 
@@ -361,8 +358,7 @@ export default class ModalParroquia extends Component {
         },
       ];
 
-      const handleDateChange = (date) => {
-        this.setState({ eucaristias: [], selectedDate: date });
+      const handleDateChange = (date, selectedHorario = "", asistenteId = "") => {
     
         var errorMsg = "";
         const fecha = {
@@ -382,31 +378,311 @@ export default class ModalParroquia extends Component {
             res.json().then(resp => {
                 if(!res.ok){
                     errorMsg = "Error interno. Por favor vuelva a intentar.";
-                    this.setState({ errorGetInscritos: errorMsg });
+                    this.setState({ 
+                        errorGetInscritos: errorMsg,
+                        selectedDate: date,
+                        selectedHorario: "", 
+                        asistente: "",
+                        asistenteId: "", 
+                        temperatura: "",
+                        eucaristias: [] 
+                    });
                 }
                 else if (resp.eucaristias.length < 1){
                     errorMsg = "Aún no hay cupos reservados en las Eucaristias de este día.";
-                    this.setState({ errorGetInscritos: errorMsg });
+                    this.setState({ 
+                        errorGetInscritos: errorMsg,
+                        selectedDate: date,
+                        selectedHorario: "", 
+                        asistente: "",
+                        asistenteId: "", 
+                        temperatura: "",
+                        eucaristias: []  
+                    });
                 }
                 else{
                     resp.eucaristias.forEach(e => {
-                        e.hValue = e.hora.endsWith("a.m") ? parseInt(horariosAm.find(obj => {return obj.text === e.hora}).value) : parseInt(horariosPm.find(obj => {return obj.text === e.hora}).value)
+                        e.value = e.hora.endsWith("a.m") ? parseInt(horariosAm.find(obj => {return obj.text === e.hora}).value) : parseInt(horariosPm.find(obj => {return obj.text === e.hora}).value);
+                        e.text = e.hora;
                     });
                     resp.eucaristias.sort(function(a, b) { 
-                        return a.hValue - b.hValue;
-                    })                    
-                    this.setState({ errorGetInscritos: "", eucaristias: resp.eucaristias });
+                        return a.value - b.value;
+                    })
+                    if(selectedHorario && asistenteId){
+                        this.setState({ 
+                            errorGetInscritos: "",
+                            eucaristias: resp.eucaristias,
+                            asistentesEucaristia: resp.eucaristias.find(obj => {return obj.value === selectedHorario}).asistentes,
+                            selectedHorario: selectedHorario,
+                            asistente: resp.eucaristias.find(obj => {return obj.value === selectedHorario}).asistentes.find(obj => {return obj.id === asistenteId}),
+                            selectedDate: date
+                        });
+                    }
+                    else if(selectedHorario && !isNaN(selectedHorario) && !asistenteId){
+                        this.setState({ 
+                            errorGetInscritos: "",
+                            eucaristias: resp.eucaristias,
+                            asistentesEucaristia: resp.eucaristias.find(obj => {return obj.value === selectedHorario}).asistentes,
+                            selectedHorario: selectedHorario,
+                            asistente: "",
+                            selectedDate: date,
+                            asistenteId: "", 
+                            temperatura: ""
+                        });
+                    }
+                    else{
+                        this.setState({ 
+                            errorGetInscritos: "", 
+                            eucaristias: resp.eucaristias,
+                            selectedDate: date,
+                            selectedHorario: "", 
+                            asistente: "",
+                            asistenteId: "", 
+                            temperatura: "" 
+                        });
+                    }                    
                 }
             })
           );
       };
+
+      const handleChangeEucaristia = (e, {value}) => {
+        this.setState({
+            asistentesEucaristia: this.state.eucaristias.find(obj => {return obj.value === value}).asistentes,
+            selectedHorario: value,
+            asistenteId: "",
+            asistente: "",
+            temperatura: ""
+        });
+      };
+
+      const handleChangeTemperatura = (temperatura) => {
+          if(!isNaN(temperatura)){
+            this.setState({ temperatura: temperatura });
+          }
+          else{
+            this.setState({ temperatura: "" });
+          }        
+      };
+
+      const lookForAsistente = (id) => {
+          this.setState({asistenteId: id});
+          const asistente = this.state.asistentesEucaristia.find(obj => {return obj.id === id})
+          
+          if (asistente){
+              this.setState({asistente: asistente});
+          }
+          else{
+            this.setState({asistente: "", temperatura: ""});
+          }
+      }
+
+      const reportes = <Form>
+            {this.state.errorGetInscritos && <Message
+                error
+                header='Importante'
+                content={this.state.errorGetInscritos}
+                visible
+            />}
+
+            <Form.Field>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <KeyboardDatePicker
+                        id="date-picker-dialog-reportes"
+                        format="dd/MM/yyyy"
+                        value={this.state.selectedDate}
+                        onChange={handleDateChange}
+                        KeyboardButtonProps={{'aria-label': 'change date'}}
+                        />
+                </MuiPickersUtilsProvider>
+            </Form.Field>
+
+            {!this.state.errorGetInscritos && <Message
+                warning
+                header='Importante'
+                content="Si no sale el horario específico que buscas para este día, es porque no hay asistentes inscritos en ese horario."
+                visible
+            />}
+
+            {this.state.eucaristias.length > 0 && <Form.Field>
+                <Button.Group basic vertical fluid>
+                    {this.state.eucaristias.map(res => {
+                        return(
+                            <Button key={res.hora}
+                            icon='download' 
+                            labelPosition='right' 
+                            content={res.hora}
+                            onClick={()=>{this.downloadPdf(res)}}
+                            />
+                        )
+                    })}
+                </Button.Group>
+            </Form.Field>} 
+        </Form>
+      
+      
+      const asistencia = <Form>
+        
+        {this.state.errorGetInscritos && <Message
+                error
+                header='Importante'
+                content={this.state.errorGetInscritos}
+                visible
+        />}
+
+        <Form.Field>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <KeyboardDatePicker
+                    id="date-picker-dialog-asistencia"                        
+                    format="dd/MM/yyyy"
+                    value={this.state.selectedDate}
+                    onChange={handleDateChange}
+                    KeyboardButtonProps={{'aria-label': 'change date'}}
+                    />
+            </MuiPickersUtilsProvider>
+        </Form.Field>
+
+        {this.state.eucaristias.length > 0 && <Form.Field required>
+                <Form.Select
+                    label='Horarios'
+                    fluid
+                    options={this.state.eucaristias}
+                    placeholder='Seleccione el horario'
+                    selection
+                    value={this.state.selectedHorario}
+                    onChange={handleChangeEucaristia.bind(this)}/>
+            </Form.Field>}
+
+        {this.state.eucaristias.length > 0 && <Form.Field required>
+            <label>Cédula o Tarjeta de Identidad</label>
+            <input
+                placeholder='Identificación (sin puntos ni espacios)'
+                value={this.state.asistenteId} 
+                onChange={e => {lookForAsistente(e.target.value)}}
+                />
+        </Form.Field>}
+
+        {this.state.asistente && !this.state.asistente.covidForm && <Message
+                warning
+                header='Importante'
+                content='Aún no registra autoevaluación. El asistente debe llenarla para registrar el ingreso.'
+                visible
+        />}
+
+        {this.state.asistente && <Form.Field>
+            <Table celled >
+                <Table.Header>
+                <Table.Row>
+                    <Table.HeaderCell>Nombre</Table.HeaderCell>
+                    <Table.HeaderCell>Autoevaluación</Table.HeaderCell>
+                    <Table.HeaderCell>Temperatura (ºC)</Table.HeaderCell>
+                </Table.Row>
+                </Table.Header>
+
+                <Table.Body>
+                <Table.Row>
+                    <Table.Cell>{this.state.asistente.nombre}</Table.Cell>
+                    <Table.Cell>
+                        <Icon name={this.state.asistente.covidForm ? "check" : "close"} color={this.state.asistente.covidForm ? "green" : "red"}/>
+                    </Table.Cell>
+                    <Table.Cell>
+                        <input 
+                        disabled={this.state.asistente.covidForm ? false : true} 
+                        onChange={e => handleChangeTemperatura(e.target.value)}
+                        />
+                    </Table.Cell>
+                </Table.Row>
+                </Table.Body>
+            </Table>
+        </Form.Field>}
+
+        {this.state.asistente && this.state.asistente.covidForm && this.state.asistente.covidForm.p14 && <Message
+                warning
+                header='Importante'
+                content='Ya se registró el ingreso de este usuario. Si desea corregir su temperatura vuelva a enviar este formulario.'
+                visible
+        />}
+
+        {this.state.temperatura && <Button            
+                positive
+                icon='save outline'
+                labelPosition='right'
+                content='Registrar Ingreso'
+                onClick={() => {
+                    
+                    const dataIngreso = {
+                        fecha: this.state.selectedDate.getTime()/1000,
+                        horario: this.state.selectedHorario,
+                        parroquiaId: this.state.nit,
+                        userId: this.state.asistenteId,
+                        temperatura: this.state.temperatura
+                    };
+
+                    let errorMsg = "";
+
+                    fetch("/registrarIngreso", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(dataIngreso)
+                      }).then(resp =>
+                        resp.json().then(() => {
+                              if(!resp.ok){
+                                  errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                  this.setState({ errorRegistroIngreso: errorMsg });
+                              }
+                              else{
+                                handleDateChange(this.state.selectedDate, this.state.selectedHorario, "");
+                              }
+                          })
+                    );
+                }}
+            />}
+        
+        {this.state.asistente && !this.state.asistente.covidForm && <Button            
+                color='yellow'
+                icon='redo'
+                labelPosition='right'
+                content='Refrescar datos'
+                onClick={() => handleDateChange(this.state.selectedDate, this.state.selectedHorario, this.state.asistenteId)}
+                />}
+
+    </Form>  
+
+      const panesBio = [
+        {
+          menuItem: 'Tomar asistencia',
+          pane: { 
+              key: 'tab1', 
+              content: asistencia
+            }
+        },
+        {
+          menuItem: 'Descargar reportes',
+          pane: {
+            key: 'tab2',
+            content: reportes
+          }
+        }
+      ];
+
+      const panesNoBio = [
+        {
+          menuItem: 'Descargar reportes',
+          pane: {
+            key: 'tab1',
+            content: reportes
+          }
+        }
+      ];
 
     return (
       <div>
         <List celled horizontal>
             <List.Item href='#' onClick={this.showInscribir}>Agregar Parroquia</List.Item>
             <List.Item href='#' onClick={this.showEditar}>Editar Parroquia</List.Item>
-            <List.Item href='#' onClick={this.showDownloadList}>Descargar Listas</List.Item>
+            <List.Item href='#' onClick={this.showDownloadList}>Asistencia</List.Item>
         </List>
 
         <Modal size={size} open={openInscribir} onClose={this.close}>
@@ -1300,8 +1576,8 @@ export default class ModalParroquia extends Component {
             </Modal.Content>
         </Modal>
 
-        <Modal size={size} open={openDownloadList} onClose={this.close}>
-            <Modal.Header>Descargar Listas</Modal.Header>          
+        <Modal size={size} open={openDownloadList} onClose={this.close} closeIcon>
+            <Modal.Header>Asistencia</Modal.Header>          
 
             <Modal.Content>
             {this.state.step === 1 && <Form>
@@ -1371,6 +1647,7 @@ export default class ModalParroquia extends Component {
                                         this.setState({
                                             authStepCompleted: true,
                                             step: 2,
+                                            size: "small",
                                             diocesis: data.parroquia.diocesis,
                                             ubicacion: data.parroquia.ubicacion,
                                             nombre: data.parroquia.nombre,
@@ -1402,58 +1679,11 @@ export default class ModalParroquia extends Component {
                     </Button.Group>
                 </Form>}
 
-                {this.state.step === 2 && <Form>
+                {this.state.step === 2 && <div>
                     
-                    {this.state.errorGetInscritos && <Message
-                        error
-                        header='Importante'
-                        content={this.state.errorGetInscritos}
-                        visible
-                    />}
-
-                    <Form.Field>
-                        <div id="date-picker-dialog">
-                            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                <KeyboardDatePicker
-                                    id="date-picker-dialog"
-                                    format="dd/MM/yyyy"
-                                    value={this.state.selectedDate}
-                                    onChange={handleDateChange}
-                                    KeyboardButtonProps={{'aria-label': 'change date'}}
-                                    />
-                            </MuiPickersUtilsProvider>
-                        </div>
-                    </Form.Field>
-                    <Message
-                        warning
-                        header='Importante'
-                        content="Si no sale el horario específico que buscas para este día, es porque no hay asistentes inscritos aún en ese horario."
-                        visible
-                    />
-                    {this.state.eucaristias.length > 0 && <Form.Field>
-                        <Button.Group basic vertical fluid>
-                            {this.state.eucaristias.map(res => {
-                                return(
-                                    <Button key={res.hora}
-                                    icon='download' 
-                                    labelPosition='right' 
-                                    content={res.hora}
-                                    onClick={()=>{this.downloadPdf(res)}}
-                                    />
-                                )
-                            })}
-                        </Button.Group>
-                    </Form.Field>}
-                    <Button.Group>
-                        <Button
-                        negative
-                        icon='arrow circle left'
-                        labelPosition='left'
-                        content='Volver'
-                        onClick={this.close}
-                        />
-                    </Button.Group>
-                </Form>}
+                    <Tab panes={this.state.autoEvalCovid ? panesBio : panesNoBio} renderActiveOnly={false}/>
+                    
+                </div>}
             </Modal.Content>
         </Modal>
 
