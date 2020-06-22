@@ -114,4 +114,14 @@ def registrarIngreso():
     NBData = request.get_json()
     return eucaristiaDB.registrarIngreso(NBData)
 
+@app.route('/generarColabCode', methods = ['POST'])
+def generarColabCode():
+    NBData = request.get_json()
+    return eucaristiaDB.generarColabCode(NBData)
+
+@app.route('/getEucaristiaColaborador', methods = ['POST'])
+def getEucaristiaColaborador():
+    NBData = request.get_json()
+    return eucaristiaDB.getEucaristiaColaborador(NBData)
+
 app.run()
