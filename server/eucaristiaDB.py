@@ -253,21 +253,22 @@ def getEucaristias(data):
 def getEucaristiasForUser(data):
   idsList = data.get("reservas")
   userId = data.get("id")
-  reservas = []
+  reservas = []  
   
-  for i in idsList:
-    reserva = eucaristias_db.find_one( { "id": i } )
-    asistentes = reserva.get("asistentes")
+  reservas_new = eucaristias_db.find( { "id": { "$in": idsList }, "available": True } )
+  
+  for i in reservas_new:
+    asistentes = i.get("asistentes")
 
     for j in asistentes:
         if j.get("covidForm") is not None and j.get("id") == userId:
-            reserva["covidForm"] = j.get("covidForm")
+            i["covidForm"] = j.get("covidForm")
             break
     
-    del reserva["asistentes"]
-    del reserva["_id"]
-    del reserva["cupos"]
-    reservas.append(reserva)
+    del i["asistentes"]
+    del i["_id"]
+    del i["cupos"]
+    reservas.append(i)
 
   obj = {"reservas": reservas}
   return obj
