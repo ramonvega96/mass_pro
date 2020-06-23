@@ -45,6 +45,7 @@ def getSemana(data):
 
 # add week
 def addSemana():
+    print("[" + datetime.today().strftime('%Y-%m-%d-%H:%M:%S') + "]: Health check addSemana.")
     current_week = semanas.find_one({"status": "current"})
     future_week = semanas.find_one({"status": "future"})
 
@@ -80,7 +81,7 @@ def addSemana():
         })
 
         semanas.insert(new_week)
-        print("New week added")
+        print("[" + datetime.today().strftime('%Y-%m-%d-%H:%M:%S') + "]: New week added")
     
     
 

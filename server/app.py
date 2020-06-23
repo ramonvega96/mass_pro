@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from datetime import datetime
 
 import time
 import atexit
@@ -128,16 +129,15 @@ def getEucaristiaColaborador():
     NBData = request.get_json()
     return eucaristiaDB.getEucaristiaColaborador(NBData)
 
-def check_reservas():
-    print(time.strftime("%A, %d. %B %Y %I:%M:%S %p"))
-
 def add_semana():
     semanaDB.addSemana()
 
+def disable_eucaristias():
+    eucaristiaDB.disable_eucaristias()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=add_semana, trigger="interval", seconds=5)
-#scheduler.add_job(func=check_reservas, trigger="interval", seconds=1800)
+scheduler.add_job(func=add_semana, trigger="interval", seconds=3600)
+scheduler.add_job(func=disable_eucaristias, trigger="interval", seconds=900)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app

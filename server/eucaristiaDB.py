@@ -1,7 +1,9 @@
 from pymongo import MongoClient
 import json
-import datetime
+from datetime import datetime
+import time
 import random
+import math
 
 # establecer conexion
 conn = MongoClient('localhost', 27017)
@@ -398,3 +400,29 @@ def getEucaristiaColaborador(data):
   
   del eucaristia["_id"]
   return eucaristia
+
+def disable_eucaristias():
+  print("[" + datetime.today().strftime('%Y-%m-%d-%H:%M:%S') + "]: Health check disable_eucaristias.")
+  current_time = time.time()
+  eucaristias = eucaristias_db.find( { "available": True } )
+  to_update = []
+
+  for i in eucaristias:
+    hour = math.floor(int(i.get("id").split(":")[0])/100)
+    minute = 30 if i.get("id").split(":")[0].endswith("30") else 0
+    full_date = datetime(i.get("year"), i.get("mes") + 1, i.get("dia"), hour, minute).timestamp() + 3600
+    
+    if full_date < current_time:
+      to_update.append(i.get("id"))
+  
+  
+  if len(to_update) > 0:
+    eucaristias_db.update(
+        {"id": { "$in": to_update }},
+        {"$set": 
+            {
+                "available": False
+            }
+        }, multi=True
+    )
+    print("[" + datetime.today().strftime('%Y-%m-%d-%H:%M:%S') + "]: Old eucaristias marked as unavailable.")
