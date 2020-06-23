@@ -391,9 +391,10 @@ export default class ModalParroquia extends Component {
                     });
                 }
                 else if (resp.eucaristias.length < 1){
-                    errorMsg = "Aún no hay cupos reservados en las Eucaristias de este día.";
+                    errorMsg = "No hay cupos reservados en las Eucaristias de este día.";
                     this.setState({ 
                         errorGetInscritos: errorMsg,
+                        errorNonAvailable: "",
                         selectedDate: date,
                         selectedHorario: "", 
                         asistente: "",
@@ -403,43 +404,59 @@ export default class ModalParroquia extends Component {
                     });
                 }
                 else{
+
                     resp.eucaristias.forEach(e => {
                         e.value = e.hora.endsWith("a.m") ? parseInt(horariosAm.find(obj => {return obj.text === e.hora}).value) : parseInt(horariosPm.find(obj => {return obj.text === e.hora}).value);
                         e.text = e.hora;
                     });
+
                     resp.eucaristias.sort(function(a, b) { 
                         return a.value - b.value;
                     })
-                    if(selectedHorario && asistenteId){
+
+                    if(resp.eucaristias.filter(e => e.available === true).length < 1){
+                        errorMsg = "Las Eucaristias de este día ya no están disponibles para toma de asistencia.";
                         this.setState({ 
+                            errorNonAvailable: errorMsg,
                             errorGetInscritos: "",
                             eucaristias: resp.eucaristias,
-                            selectedEucaristia: resp.eucaristias.find(obj => {return obj.value === selectedHorario}),
-                            asistentesEucaristia: resp.eucaristias.find(obj => {return obj.value === selectedHorario}).asistentes,
-                            selectedHorario: selectedHorario,
-                            asistente: resp.eucaristias.find(obj => {return obj.value === selectedHorario}).asistentes.find(obj => {return obj.id === asistenteId}),
-                            selectedDate: date
-                        });
-                    }
-                    else if(selectedHorario && !isNaN(selectedHorario) && !asistenteId){
-                        this.setState({ 
-                            errorGetInscritos: "",
-                            eucaristias: resp.eucaristias,
-                            selectedEucaristia: resp.eucaristias.find(obj => {return obj.value === selectedHorario}),
-                            asistentesEucaristia: resp.eucaristias.find(obj => {return obj.value === selectedHorario}).asistentes,
-                            selectedHorario: selectedHorario,
-                            asistente: "",
-                            selectedDate: date,
-                            asistenteId: "", 
-                            temperatura: ""
+                            selectedDate: date 
                         });
                     }
                     else{
                         this.setState({ 
-                            errorGetInscritos: "", 
+                            errorNonAvailable: "",
+                            errorGetInscritos: "",
                             eucaristias: resp.eucaristias,
-                            selectedDate: date,
-                            selectedHorario: "", 
+                            selectedDate: date
+                         });
+                    }
+
+                    if(selectedHorario && asistenteId){
+                        this.setState({ 
+                            selectedEucaristia: resp.eucaristias.find(obj => {return obj.value === selectedHorario}),
+                            asistentesEucaristia: resp.eucaristias.find(obj => {return obj.value === selectedHorario}).asistentes,
+                            selectedHorario: selectedHorario,
+                            asistente: resp.eucaristias.find(obj => {return obj.value === selectedHorario}).asistentes.find(obj => {return obj.id === asistenteId})
+                        });
+                    }
+
+                    else if(selectedHorario && !isNaN(selectedHorario) && !asistenteId){
+                        this.setState({ 
+                            selectedEucaristia: resp.eucaristias.find(obj => {return obj.value === selectedHorario}),
+                            asistentesEucaristia: resp.eucaristias.find(obj => {return obj.value === selectedHorario}).asistentes,
+                            selectedHorario: selectedHorario,
+                            asistente: "",
+                            asistenteId: "", 
+                            temperatura: ""
+                        });
+                    }
+
+                    else{
+                        this.setState({
+                            selectedEucaristia: "",
+                            asistentesEucaristia: [], 
+                            selectedHorario: "",
                             asistente: "",
                             asistenteId: "", 
                             temperatura: "" 
@@ -535,6 +552,13 @@ export default class ModalParroquia extends Component {
                 visible
         />}
 
+        {this.state.errorNonAvailable && <Message
+                warning
+                header='Importante'
+                content={this.state.errorNonAvailable}
+                visible
+        />}
+
         <Form.Field>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                 <KeyboardDatePicker
@@ -547,11 +571,11 @@ export default class ModalParroquia extends Component {
             </MuiPickersUtilsProvider>
         </Form.Field>
 
-        {this.state.eucaristias.length > 0 && <Form.Field required>
+        {this.state.eucaristias.length > 0 && !this.state.errorNonAvailable && <Form.Field required>
                 <Form.Select
                     label='Horarios'
                     fluid
-                    options={this.state.eucaristias}
+                    options={this.state.eucaristias.filter(e => e.available === true)}
                     placeholder='Seleccione el horario'
                     selection
                     value={this.state.selectedHorario}
@@ -605,7 +629,7 @@ export default class ModalParroquia extends Component {
                         />}
             </Form.Field>}
 
-        {this.state.eucaristias.length > 0 && this.state.selectedEucaristia &&<Form.Field required>
+        {this.state.eucaristias.length > 0 && this.state.selectedEucaristia && !this.state.errorNonAvailable && <Form.Field required>
             <label>Cédula o Tarjeta de Identidad</label>
             <input
                 placeholder='Identificación (sin puntos ni espacios)'
@@ -698,7 +722,7 @@ export default class ModalParroquia extends Component {
                 onClick={() => handleDateChange(this.state.selectedDate, this.state.selectedHorario, this.state.asistenteId)}
                 />}
 
-        {!this.state.asistente && <Button            
+        {!this.state.asistente && !this.state.errorNonAvailable && <Button            
                 color='yellow'
                 icon='redo'
                 labelPosition='right'
