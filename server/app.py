@@ -1,5 +1,10 @@
-from flask import Flask, jsonify
-from flask import request
+from flask import Flask, jsonify, request
+from datetime import datetime
+
+import time
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
+
 import parroquiaDB, userDB, eucaristiaDB, semanaDB
  
 app = Flask(__name__)
@@ -124,4 +129,17 @@ def getEucaristiaColaborador():
     NBData = request.get_json()
     return eucaristiaDB.getEucaristiaColaborador(NBData)
 
+def add_semana():
+    semanaDB.addSemana()
+
+def disable_eucaristias():
+    eucaristiaDB.disable_eucaristias()
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=add_semana, trigger="interval", seconds=3600)
+scheduler.add_job(func=disable_eucaristias, trigger="interval", seconds=900)
+scheduler.start()
+
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
 app.run()
