@@ -404,7 +404,16 @@ export default class ModalParroquia extends Component {
                     });
                 }
                 else{
-                    
+
+                    resp.eucaristias.forEach(e => {
+                        e.value = e.hora.endsWith("a.m") ? parseInt(horariosAm.find(obj => {return obj.text === e.hora}).value) : parseInt(horariosPm.find(obj => {return obj.text === e.hora}).value);
+                        e.text = e.hora;
+                    });
+
+                    resp.eucaristias.sort(function(a, b) { 
+                        return a.value - b.value;
+                    })
+
                     if(resp.eucaristias.filter(e => e.available === true).length < 1){
                         errorMsg = "Las Eucaristias de este día ya no están disponibles para toma de asistencia.";
                         this.setState({ 
@@ -422,15 +431,6 @@ export default class ModalParroquia extends Component {
                             selectedDate: date
                          });
                     }
-
-                    resp.eucaristias.forEach(e => {
-                        e.value = e.hora.endsWith("a.m") ? parseInt(horariosAm.find(obj => {return obj.text === e.hora}).value) : parseInt(horariosPm.find(obj => {return obj.text === e.hora}).value);
-                        e.text = e.hora;
-                    });
-
-                    resp.eucaristias.sort(function(a, b) { 
-                        return a.value - b.value;
-                    })
 
                     if(selectedHorario && asistenteId){
                         this.setState({ 
@@ -575,7 +575,7 @@ export default class ModalParroquia extends Component {
                 <Form.Select
                     label='Horarios'
                     fluid
-                    options={this.state.eucaristias}
+                    options={this.state.eucaristias.filter(e => e.available === true)}
                     placeholder='Seleccione el horario'
                     selection
                     value={this.state.selectedHorario}
