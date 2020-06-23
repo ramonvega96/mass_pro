@@ -1,6 +1,10 @@
 import React, { Component } from 'react'
 import { Button, Modal, Form, Message, List, Checkbox, Card, Divider } from 'semantic-ui-react'
 
+import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+
 export default class ModalInscripcion extends Component {
   state = { open: false }
 
@@ -303,11 +307,7 @@ export default class ModalInscripcion extends Component {
         }
     ];
 
-    const handleChangeDay = (e, {value}) => {
-      this.setState({selectedDay: value, errorInscripcion: "" })
-    }
-
-    const handleChangeWeek = (e, {value}) => {
+    const handleChangeDate = (value, date) => {
       this.setState({selectedWeek: value});
       
       const dataWeekParroquia = {
@@ -333,7 +333,10 @@ export default class ModalInscripcion extends Component {
                 this.setState({ errorGetEucaristias: errorMsg });
             }
             else{
-              this.setState({ eucaristiasSemana: data.eucaristias });
+              this.setState({ 
+                eucaristiasSemana: data.eucaristias,
+                selectedDay: dias.find(obj => {return obj.key === date.getDay()}).value
+               });
             }
         })
       );
@@ -374,6 +377,44 @@ export default class ModalInscripcion extends Component {
       const cupos = eucaristia ? eucaristia.cupos : this.state.parroquia.capacidad;
       return cupos
     }
+
+    const handleDateChange = (date) => {
+      if(date instanceof Date){
+        date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        this.setState({selectedDate: date});
+        
+        const dateData = {
+          day: date.getDate(),
+          month: date.getMonth(),
+          year: date.getFullYear()
+        }
+
+        let errorMsg = "";
+        
+        fetch("/getSemana", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(dateData)
+        }).then(resp =>
+            resp.json().then(data => {
+                  if(!resp.ok){
+                      errorMsg = "Error interno. Por favor vuelva a intentar.";
+                      this.setState({ errorColabCodeEucaristia: errorMsg });
+                  }
+                  else if (data.error){
+                    errorMsg = data.error;
+                    this.setState({ errorGetSemanas: errorMsg, size: 'mini', selectedDay: "" });
+                  }
+                  else{
+                    this.setState({errorGetSemanas: "", size: 'small'});
+                    handleChangeDate(data.value, date);
+                  }
+            })
+        );
+      }
+    };
 
     return (
       <div>
@@ -489,6 +530,7 @@ export default class ModalInscripcion extends Component {
                                       }
                                       else{
                                         this.authDone(data);
+                                        handleDateChange(new Date());
                                       }
                                   })
                                 );
@@ -512,6 +554,7 @@ export default class ModalInscripcion extends Component {
                                     }
                                     else{
                                         this.authDone(data);
+                                        handleDateChange(new Date());
                                     }
                                 })
                               );
@@ -534,28 +577,27 @@ export default class ModalInscripcion extends Component {
                 </Form>}
 
                 {this.state.step === 2 && this.state.horarioDisponible && <Form>
-                    
-                    <Form.Group widths='equal'>
-                      <Form.Select
-                        label='Semana'
-                        fluid
-                        options={this.state.semanas}
-                        placeholder='Semana'
-                        selection
-                        onChange={handleChangeWeek.bind(this)}
-                        value={this.state.selectedWeek}
-                        disabled={this.state.selectedWeek ? true : false}                        
-                        />
-                        <Form.Select
-                        label='Dia de la semana'
-                        fluid
-                        options={dias}
-                        placeholder='Dia de la semana'
-                        onChange={handleChangeDay.bind(this)}
-                        value={this.state.selectedDay}
-                        disabled={!this.state.selectedWeek}
-                        />                        
-                    </Form.Group>
+                  
+                  <Form.Field>
+                    <div id="date-picker-dialog-asistencia" >
+                      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                          <KeyboardDatePicker
+                              id="date-picker-dialog-asistencia"                        
+                              format="dd/MM/yyyy"
+                              value={this.state.selectedDate}
+                              onChange={handleDateChange}
+                              KeyboardButtonProps={{'aria-label': 'change date'}}
+                              />
+                      </MuiPickersUtilsProvider>
+                    </div>
+                  </Form.Field>
+
+                  {this.state.errorGetSemanas && <Message
+                        warning
+                        header={this.state.errorGetSemanas}
+                        content="Únicamente están disponibles la semana en curso y la siguiente."
+                        visible
+                    />}
                     
                     {this.state.horario.lunAm.length > 0 && this.state.selectedDay === "lun" && <Form.Field>
                     <label>Horarios en la mañana</label>
