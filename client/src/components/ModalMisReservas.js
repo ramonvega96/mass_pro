@@ -209,10 +209,36 @@ export default class ModalMisReservas extends Component {
     this.state.aP11 &&
     this.state.aP12 &&
     this.state.aP13){
-      this.setState({covidFormFilled: true})
+      if(this.state.aP1 === "No" &&
+        this.state.aP2 === "Sin tos seca" &&
+        this.state.aP3 === "No" &&
+        this.state.aP4 === "No" &&
+        this.state.aP5 === "Sin dolor" &&
+        this.state.aP6 === "Sin dolor" &&
+        this.state.aP7 === "Si" &&
+        this.state.aP8 === "Ninguna Molestia" &&
+        this.state.aP9 === "No" &&
+        this.state.aP10 === "Sin dolor" &&
+        this.state.aP11 === "No" &&
+        this.state.aP12 === "No" &&
+        this.state.aP13 === "No"){
+        this.setState({
+          covidFormFilled: true,
+          presentaSintoma: ""
+        });
+      }
+      else{
+        this.setState({
+          covidFormFilled: false,
+          presentaSintoma: "Usted presenta alguno de los síntomas o ha tenido contacto en los últimos 14 días o vive con alguien sospechoso o confirmado de tener COVID-19. Preferiblemente abstengase de asistir a esta Eucaristia."
+        });
+      }
     }
     else{
-      this.setState({covidFormFilled: false})
+      this.setState({
+        covidFormFilled: false,
+        presentaSintoma: ""
+      });
     }    
   }
 
@@ -231,7 +257,8 @@ export default class ModalMisReservas extends Component {
       aP10: "",
       aP11: "",
       aP12: "",
-      aP13: ""
+      aP13: "",
+      presentaSintoma: ""
     })
   }
 
@@ -463,6 +490,14 @@ export default class ModalMisReservas extends Component {
                 </div>}
 
                 {this.state.step === 3 && this.state.selectedReserva && <Form>
+                  <Message
+                        warning
+                        header='Tenga en cuenta'
+                        content={<p>La siguiente es una <strong>autovaloración</strong>. Por su bien y el de su comunidad, 
+                          responda con absoluta sinceridad. Si presenta algún síntoma, preferiblemente 
+                          quedese en casa.</p>}
+                        visible
+                    /> 
 
                   <Form.Field>
                   <Accordion>
@@ -831,6 +866,13 @@ export default class ModalMisReservas extends Component {
                       </Form.Field>
                     </Form.Group>
                     </div>}
+
+                    {this.state.presentaSintoma && <Message
+                        error
+                        header='Importante'
+                        content={this.state.presentaSintoma}
+                        visible
+                    />} 
 
                     <Button.Group fluid>
                       <Button
