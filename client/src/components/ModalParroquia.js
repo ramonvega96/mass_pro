@@ -48,7 +48,7 @@ export default class ModalParroquia extends Component {
     showDownloadList = () => this.setState({ openDownloadList: true, size: 'mini', soyColaborador: false })    
     backToFirstStep = () => this.setState({ step: 1, errorCreando: "" })    
     
-    downloadPdf = (e) => {     
+    downloadListaInscritos = (e) => {     
         const unit = "pt";
         const size = "A4";
         const orientation = "portrait";
@@ -58,13 +58,13 @@ export default class ModalParroquia extends Component {
 
         doc.setFontSize(15);
 
-        const title = "Lista de Asistencia - " + this.state.nombre;
+        const title = "Lista de Inscritos - " + this.state.nombre;
         
         const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         const fecha = this.state.selectedDate.getDate() + " de " + months[this.state.selectedDate.getMonth()] + " de " + this.state.selectedDate.getFullYear();
         const hora = e.hora;
         
-        const headers = [["NOMBRE", "C.C. / T.I.", "TELÉFONO", "DIRECCIÓN", "UBICACIÓN", "ASISTIÓ"]];
+        const headers = [["NOMBRE", "C.C. / T.I.", "TELÉFONO", "DIRECCIÓN", "UBICACIÓN"]];
 
         const data = e.asistentes.map(a => [a.nombre, a.id, a.telefono, a.direccion, a.ubicacion]);
 
@@ -79,7 +79,205 @@ export default class ModalParroquia extends Component {
         doc.text("Fecha: " + fecha, marginLeft, 60);
         doc.text("Hora: " + hora, marginLeft, 80);
         doc.autoTable(content);
-        doc.save(fecha + " - " + hora + ".pdf")
+        doc.save(fecha + " - " + hora + " - Inscritos.pdf")
+    }
+
+    downloadReporteBio = (e) => {     
+        const unit = "pt";
+        const size = "A4";
+        const orientation = "portrait";
+
+        const marginLeft = 40;
+        const doc = new jsPDF(orientation, unit, size);
+
+        doc.setFontSize(15);
+
+        const title = "Reporte Bioseguridad - " + this.state.nombre;
+        
+        const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const fecha = this.state.selectedDate.getDate() + " de " + months[this.state.selectedDate.getMonth()] + " de " + this.state.selectedDate.getFullYear();
+        const hora = e.hora;
+        
+        const headers = [["NOMBRE", "C.C. / T.I.", "TELÉFONO", "DIRECCIÓN", "UBICACIÓN"]];
+
+        let ausentes = e.asistentes.filter(e => !e.covidForm)
+        let asistentes = e.asistentes.filter(e => e.covidForm)
+        
+        for (var i = 0; i < asistentes.length; i++) {
+            let a = asistentes[i];
+
+            if( i % 2 === 0){
+                
+                if(i > 0){
+                    doc.addPage();
+                }
+
+                doc.text(title, marginLeft, 40);
+                doc.text("Fecha: " + fecha + " - Hora: " + hora, marginLeft, 60);
+            }
+
+            let data = [
+                [a.nombre, a.id, a.telefono, a.direccion, a.ubicacion], 
+                [{
+                    content: a.covidForm.p1.split(":")[0],
+                    colSpan: 3
+                },
+                {
+                    content: a.covidForm.p1.split(":")[1],
+                    colSpan: 2
+                }], 
+                [{
+                    content: a.covidForm.p2.split(":")[0],
+                    colSpan: 3
+                },
+                {
+                    content: a.covidForm.p2.split(":")[1],
+                    colSpan: 2
+                }], 
+                [{
+                    content: a.covidForm.p3.split(":")[0],
+                    colSpan: 3
+                },
+                {
+                    content: a.covidForm.p3.split(":")[1],
+                    colSpan: 2
+                }], 
+                [{
+                    content: a.covidForm.p4.split(":")[0],
+                    colSpan: 3
+                },
+                {
+                    content: a.covidForm.p4.split(":")[1],
+                    colSpan: 2
+                }], 
+                [{
+                    content: a.covidForm.p5.split(":")[0],
+                    colSpan: 3
+                },
+                {
+                    content: a.covidForm.p5.split(":")[1],
+                    colSpan: 2
+                }], 
+                [{
+                    content: a.covidForm.p6.split(":")[0],
+                    colSpan: 3
+                },
+                {
+                    content: a.covidForm.p6.split(":")[1],
+                    colSpan: 2
+                }], 
+                [{
+                    content: a.covidForm.p7.split(":")[0],
+                    colSpan: 3
+                },
+                {
+                    content: a.covidForm.p7.split(":")[1],
+                    colSpan: 2
+                }], 
+                [{
+                    content: a.covidForm.p8.split(":")[0],
+                    colSpan: 3
+                },
+                {
+                    content: a.covidForm.p8.split(":")[1],
+                    colSpan: 2
+                }], 
+                [{
+                    content: a.covidForm.p9.split(":")[0],
+                    colSpan: 3
+                },
+                {
+                    content: a.covidForm.p9.split(":")[1],
+                    colSpan: 2
+                }], 
+                [{
+                    content: a.covidForm.p10.split(":")[0],
+                    colSpan: 3
+                },
+                {
+                    content: a.covidForm.p10.split(":")[1],
+                    colSpan: 2
+                }], 
+                [{
+                    content: a.covidForm.p11.split(":")[0],
+                    colSpan: 3
+                },
+                {
+                    content: a.covidForm.p11.split(":")[1],
+                    colSpan: 2
+                }], 
+                [{
+                    content: a.covidForm.p12.split(":")[0],
+                    colSpan: 3
+                },
+                {
+                    content: a.covidForm.p12.split(":")[1],
+                    colSpan: 2
+                }], 
+                [{
+                    content: a.covidForm.p13.split(":")[0],
+                    colSpan: 3
+                },
+                {
+                    content: a.covidForm.p13.split(":")[1],
+                    colSpan: 2
+                }]
+            ];
+
+            if(a.covidForm.p14){
+                data.push(
+                    [{
+                        content: a.covidForm.p14.split(":")[0],
+                        colSpan: 3
+                    },
+                    {
+                        content: a.covidForm.p14.split(":")[1],
+                        colSpan: 2
+                    }]
+                );
+            }
+            else{
+                data.push(
+                    [{
+                        content: "No hay registro de temperatura.",
+                        colSpan: 5,
+                        styles: { halign: 'center', fillColor: [255, 209, 209] },
+                    }]
+                );
+            }
+            
+            let content = {
+                theme: "grid",
+                startY: i % 2 === 0 ? 70 : 430,
+                head: headers,
+                body: data
+            };
+
+            doc.autoTable(content);
+        }
+
+        if(ausentes.length > 0){
+            if(asistentes.length > 0){
+                doc.addPage();
+            }
+
+            doc.text(title, marginLeft, 40);
+            doc.text("Fecha: " + fecha + " - Hora: " + hora, marginLeft, 60);
+            doc.text("Lista de inscritos SIN autoevaluación", marginLeft, 80);
+            
+            const data = ausentes.map(a => [a.nombre, a.id, a.telefono, a.direccion, a.ubicacion]);
+
+            let content = {
+                theme: "grid",
+                startY: 90,
+                head: headers,
+                body: data
+            };
+
+            doc.autoTable(content);
+        }
+        
+        doc.save(fecha + " - " + hora + " - Reporte.pdf")
     }
 
     close = () => this.setState({ 
@@ -499,7 +697,7 @@ export default class ModalParroquia extends Component {
           }
       }
 
-      const reportes = <Form>
+      const reportesBio = <Form>
             {this.state.errorGetInscritos && <Message
                 error
                 header='Importante'
@@ -534,12 +732,71 @@ export default class ModalParroquia extends Component {
                             icon='download' 
                             labelPosition='right' 
                             content={res.hora}
-                            onClick={()=>{this.downloadPdf(res)}}
+                            onClick={()=>{this.downloadListaInscritos(res)}}
                             />
                         )
                     })}
                 </Button.Group>
             </Form.Field>} 
+        </Form>
+
+    const reportesNoBio = <Form>
+        {this.state.errorGetInscritos && <Message
+            error
+            header='Importante'
+            content={this.state.errorGetInscritos}
+            visible
+        />}
+
+        <Form.Field>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <KeyboardDatePicker
+                    id="date-picker-dialog-reportes"
+                    format="dd/MM/yyyy"
+                    value={this.state.selectedDate}
+                    onChange={handleDateChange}
+                    KeyboardButtonProps={{'aria-label': 'change date'}}
+                    />
+            </MuiPickersUtilsProvider>
+        </Form.Field>
+
+        {!this.state.errorGetInscritos && <Message
+            warning
+            header='Importante'
+            content="Si no sale el horario específico que buscas para este día, es porque no hay asistentes inscritos en ese horario."
+            visible
+        />}
+
+        {this.state.eucaristias.length > 0 && <Form.Group widths='equal'>
+            <Form.Field>
+            <Button.Group basic vertical fluid>
+                {this.state.eucaristias.map(res => {
+                    return(
+                        <Button key={res.hora}
+                        icon='download' 
+                        labelPosition='right' 
+                        content={"Lista Inscritos - " + res.hora}
+                        onClick={()=>{this.downloadListaInscritos(res)}}
+                        />
+                    )
+                })}
+            </Button.Group>
+            </Form.Field>
+            <Form.Field>
+            <Button.Group basic vertical fluid>
+                {this.state.eucaristias.map(res => {
+                    return(
+                        <Button key={res.hora}
+                        icon='download' 
+                        labelPosition='right' 
+                        content={"Reporte Bioseguridad - " + res.hora}
+                        onClick={()=>{this.downloadReporteBio(res)}}
+                        />
+                    )
+                })}
+            </Button.Group>
+            </Form.Field>
+        </Form.Group>} 
         </Form>
       
       
@@ -949,7 +1206,7 @@ export default class ModalParroquia extends Component {
           menuItem: 'Descargar reportes',
           pane: {
             key: 'tab2',
-            content: reportes
+            content: reportesNoBio
           }
         }
       ];
@@ -969,7 +1226,7 @@ export default class ModalParroquia extends Component {
           menuItem: 'Descargar listas',
           pane: {
             key: 'tab1',
-            content: reportes
+            content: reportesBio
           }
         }
       ];
