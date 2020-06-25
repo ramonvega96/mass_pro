@@ -39,7 +39,10 @@ export default class ModalParroquia extends Component {
 
             selectedDate: new Date(),
             eucaristias: [],
-            autoEvalCovid: false
+            autoEvalCovid: false,
+
+            forgotPw: false,
+            pwRecovered: false
         }
     }
 
@@ -304,6 +307,7 @@ export default class ModalParroquia extends Component {
         cPassword: "",
         diocesis: "",
         ubicacion: "",
+        email: "",
         autoEvalCovid: false,
 
         selectedDate: new Date(),
@@ -324,7 +328,9 @@ export default class ModalParroquia extends Component {
         hDomAm: [],
         hDomPm: [],
 
-        codigoColaborador: ""
+        codigoColaborador: "",
+        forgotPw: false,
+        pwRecovered: false
     });
   
   
@@ -340,6 +346,7 @@ export default class ModalParroquia extends Component {
         this.state.capacidad &&
         this.state.diocesis &&
         this.state.ubicacion &&
+        this.state.email &&
         this.state.password &&
         this.state.cPassword &&
         this.state.cPassword === this.state.password){
@@ -357,6 +364,16 @@ export default class ModalParroquia extends Component {
         }
         else{
           this.setState({ authStepCompleted: false });
+        }
+      }
+
+      checkDataPwRecover() {
+        if(this.state.nit &&
+          !isNaN(this.state.nit)){
+            this.setState({ authStepCompleted: true, errorAuth: "" });
+        }
+        else{
+            this.setState({ authStepCompleted: false, errorAuth: "" });
         }
       }
 
@@ -1299,6 +1316,13 @@ export default class ModalParroquia extends Component {
                             value={this.state.telefono}/>
                     </Form.Field>
                     <Form.Field required>
+                        <label>Email</label>
+                        <input
+                            placeholder='Correo Electrónico' 
+                            onChange={e => this.setState({ email: e.target.value }, () => this.checkDataParroquia())}
+                            value={this.state.email}/>
+                    </Form.Field> 
+                    <Form.Field required>
                         <label>Dirección de la Parroquia</label>
                         <input 
                             placeholder='Dirección Parroquia' 
@@ -1306,9 +1330,9 @@ export default class ModalParroquia extends Component {
                             value={this.state.direccion}/>
                     </Form.Field>
                     <Form.Field required>
-                        <label>Capacidad de la Parroquia</label>
+                        <label>Capacidad de la Parroquia - Considere restricciones de aforo COVID</label>
                         <input 
-                            placeholder='Capacidad Parroquia (Número de personas)' 
+                            placeholder='Capacidad Parroquia (Número de personas - Considerando restricciones de aforo COVID)' 
                             onChange={e => this.setState({ capacidad: e.target.value }, () => this.checkDataParroquia())}
                             value={this.state.capacidad}/>
                     </Form.Field>
@@ -1556,7 +1580,8 @@ export default class ModalParroquia extends Component {
 
                             const parroquia = {
                                 diocesis: this.state.diocesis,
-                                ubicacion: this.state.ubicacion, 
+                                ubicacion: this.state.ubicacion,
+                                email: this.state.email, 
                                 nombre: this.state.nombre, 
                                 nit: this.state.nit, 
                                 parroco: this.state.parroco, 
@@ -1728,6 +1753,7 @@ export default class ModalParroquia extends Component {
                                             step: 2,
                                             diocesis: data.parroquia.diocesis,
                                             ubicacion: data.parroquia.ubicacion,
+                                            email: data.parroquia.email,
                                             nombre: data.parroquia.nombre,
                                             parroco: data.parroquia.parroco, 
                                             capacidad: data.parroquia.capacidad,
@@ -1755,7 +1781,104 @@ export default class ModalParroquia extends Component {
                         }}
                         />
                     </Button.Group>
+                    <Modal.Actions>
+                      <List celled horizontal>
+                          <List.Item href='#'onClick={() => this.setState({forgotPw: true, nit: "", step: 0})                              
+                            }>Olvidé la contraseña</List.Item>
+                      </List>
+                    </Modal.Actions>
                 </Form>}
+
+                {this.state.forgotPw && <Form>
+                  
+                  {!this.state.pwdSent && !this.state.errorAuth && <Message
+                        warning
+                        header='Recuperar contraseña'
+                        content='Para recuperar la contraseña necesitamos identificar la parroquia.'
+                        visible
+                    />}
+
+                  <Form.Field required>
+                        <label>Nit de la parroquia</label>
+                        <input
+                            placeholder='NIT (sin puntos ni espacios)' 
+                            onChange={e => this.setState({ nit: e.target.value }, () => this.checkDataPwRecover())}
+                            value={this.state.nit}/>
+                    </Form.Field>
+
+                    {this.state.pwdSent && <Message
+                        success
+                        header='Contraseña enviada'
+                        content={this.state.pwdSent}
+                        visible
+                    />}
+
+                    {this.state.errorAuth && <Message
+                        error
+                        header='Error'
+                        content={this.state.errorAuth}
+                        visible
+                    />}
+
+                    <Button.Group>
+                        <Button
+                        negative
+                        icon='arrow circle left'
+                        labelPosition='left'
+                        content='Volver'
+                        onClick={() => this.setState({
+                          forgotPw: false, 
+                          nit: "", 
+                          step: 1, 
+                          errorAuth: "",
+                          pwdSent: "",
+                          pwRecovered: false,
+                          authStepCompleted: false
+                        })}
+                        />
+                        <Button.Or text='O'/>
+                        <Button
+                        positive
+                        icon='paper plane outline'
+                        labelPosition='right'
+                        content='Enviar'
+                        disabled={!this.state.authStepCompleted || this.state.pwRecovered}
+                        onClick={() => {
+
+                          let errorMsg = "";
+                          const authData = {
+                            "nit": this.state.nit
+                          }
+
+                          fetch("/forgotParroquiaPassword", {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(authData)
+                          }).then(res =>
+                            res.json().then(data => {
+                                if(!res.ok){
+                                    errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                    this.setState({ errorAuth: errorMsg });
+                                }
+                                else if (data.error){
+                                    errorMsg = data.error;
+                                    this.setState({ errorAuth: errorMsg });
+                                }
+                                else{
+                                  this.setState({ 
+                                    pwdSent: "Tu contraseña fue enviada a: " + data.email,
+                                    pwRecovered: true
+                                  });
+                                }
+                            })
+                          );
+
+                        }}
+                        />
+                    </Button.Group>                  
+                  </Form>}
 
                 {this.state.step === 2 && <Form>
                     <Form.Field required>
@@ -1794,6 +1917,13 @@ export default class ModalParroquia extends Component {
                             value={this.state.telefono}/>
                     </Form.Field>
                     <Form.Field required>
+                        <label>Email</label>
+                        <input
+                            placeholder='Correo Electrónico' 
+                            onChange={e => this.setState({ email: e.target.value }, () => this.checkDataParroquia())}
+                            value={this.state.email}/>
+                    </Form.Field>  
+                    <Form.Field required>
                         <label>Dirección de la Parroquia</label>
                         <input 
                             placeholder='Dirección Parroquia' 
@@ -1801,9 +1931,9 @@ export default class ModalParroquia extends Component {
                             value={this.state.direccion}/>
                     </Form.Field>
                     <Form.Field required>
-                        <label>Capacidad de la Parroquia</label>
+                        <label>Capacidad de la Parroquia - Considere restricciones de aforo COVID</label>
                         <input 
-                            placeholder='Capacidad Parroquia (Número de personas)' 
+                            placeholder='Capacidad Parroquia (Número de personas - Considerando restricciones de aforo COVID)' 
                             onChange={e => this.setState({ capacidad: e.target.value }, () => this.checkDataParroquia())}
                             value={this.state.capacidad}/>
                     </Form.Field>
@@ -2053,6 +2183,7 @@ export default class ModalParroquia extends Component {
                                 newNombre: this.state.nombre,
                                 newDiocesis: this.state.diocesis,
                                 newUbicacion: this.state.ubicacion,
+                                newEmail: this.state.email,
                                 newParroco: this.state.parroco, 
                                 newCapacidad: this.state.capacidad, 
                                 newPassword: this.state.password, 
@@ -2204,6 +2335,7 @@ export default class ModalParroquia extends Component {
                                             size: "small",
                                             diocesis: data.parroquia.diocesis,
                                             ubicacion: data.parroquia.ubicacion,
+                                            email: data.parroquia.email,
                                             nombre: data.parroquia.nombre,
                                             parroco: data.parroquia.parroco, 
                                             capacidad: data.parroquia.capacidad,
@@ -2231,6 +2363,15 @@ export default class ModalParroquia extends Component {
                         }}
                         />
                     </Button.Group>
+                    
+                    <Modal.Actions>
+                      <List celled horizontal>
+                          <List.Item href='#'onClick={() => this.setState({forgotPw: true, nit: "", step: 0})                              
+                            }>Olvidé la contraseña</List.Item>
+                      </List>
+                    </Modal.Actions>
+                    
+                    
                     <Divider />
                     <Form.Field>
                         <Button  fluid          
@@ -2304,6 +2445,97 @@ export default class ModalParroquia extends Component {
                     />} 
 
                 </Form>}
+
+                {this.state.forgotPw && <Form>
+                  
+                  {!this.state.pwdSent && !this.state.errorAuth && <Message
+                        warning
+                        header='Recuperar contraseña'
+                        content='Para recuperar la contraseña necesitamos identificar la parroquia.'
+                        visible
+                    />}
+
+                  <Form.Field required>
+                        <label>Nit de la parroquia</label>
+                        <input
+                            placeholder='NIT (sin puntos ni espacios)' 
+                            onChange={e => this.setState({ nit: e.target.value }, () => this.checkDataPwRecover())}
+                            value={this.state.nit}/>
+                    </Form.Field>
+
+                    {this.state.pwdSent && <Message
+                        success
+                        header='Contraseña enviada'
+                        content={this.state.pwdSent}
+                        visible
+                    />}
+
+                    {this.state.errorAuth && <Message
+                        error
+                        header='Error'
+                        content={this.state.errorAuth}
+                        visible
+                    />}
+
+                    <Button.Group>
+                        <Button
+                        negative
+                        icon='arrow circle left'
+                        labelPosition='left'
+                        content='Volver'
+                        onClick={() => this.setState({
+                          forgotPw: false, 
+                          nit: "", 
+                          step: 1, 
+                          errorAuth: "",
+                          pwdSent: "",
+                          pwRecovered: false,
+                          authStepCompleted: false
+                        })}
+                        />
+                        <Button.Or text='O'/>
+                        <Button
+                        positive
+                        icon='paper plane outline'
+                        labelPosition='right'
+                        content='Enviar'
+                        disabled={!this.state.authStepCompleted || this.state.pwRecovered}
+                        onClick={() => {
+
+                          let errorMsg = "";
+                          const authData = {
+                            "nit": this.state.nit
+                          }
+
+                          fetch("/forgotParroquiaPassword", {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(authData)
+                          }).then(res =>
+                            res.json().then(data => {
+                                if(!res.ok){
+                                    errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                    this.setState({ errorAuth: errorMsg });
+                                }
+                                else if (data.error){
+                                    errorMsg = data.error;
+                                    this.setState({ errorAuth: errorMsg });
+                                }
+                                else{
+                                  this.setState({ 
+                                    pwdSent: "Tu contraseña fue enviada a: " + data.email,
+                                    pwRecovered: true
+                                  });
+                                }
+                            })
+                          );
+
+                        }}
+                        />
+                    </Button.Group>                  
+                  </Form>}
 
                 {this.state.step === 2 && !this.state.codigoColaborador && <div>
                     

@@ -8,8 +8,9 @@
 }
 
 .ui.input {
-  justify-content: center;
-  margin: 24.5px;
+  padding: 24.5px 0px 24.5px 0px;
+  margin: 0 auto;
+  width: 24em;
 }
 
 .ui.steps {
@@ -32,7 +33,7 @@
 }
 
 .ui.positive.button {
-  margin: 1em 0px 1em 0px;
+  margin: 0px 0px 1em 0px;
 }
 
 .footerStyle {
@@ -40,18 +41,16 @@
   font-size: 20px;
   border-radius: 1px solid #E7E7E7;
   text-align: center;
-  padding: 20px;
   position: fixed;
   left: 0;
   bottom: 0;
-  height: 60px;
+  height: 40px;
   width: 100%;
+  vertical-align: middle;
 }
 
 .phantomStyle {
-  display: block;
-  padding: 20px;
-  height: 60px;
+  height: 40px;
   width: 100%;
 }
 
