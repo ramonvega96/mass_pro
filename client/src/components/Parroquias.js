@@ -18,7 +18,7 @@ export default class Parroquias extends Component {
                                         ({parroquia.ubicacion})
                                     </Card.Header>
                                     <br/>
-                                    <Card.Meta>Diocesis de {parroquia.diocesis}</Card.Meta>
+                                    <Card.Meta>Diocesis: {parroquia.diocesis}</Card.Meta>
                                     <Card.Meta>{parroquia.direccion}</Card.Meta>
                                     <Card.Meta>{parroquia.telefono}</Card.Meta>
                                     <Card.Description>

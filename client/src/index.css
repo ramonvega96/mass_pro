@@ -4,6 +4,13 @@ body {
     sans-serif;
 }
 
+#root{
+  background-image: url("./images/background.jpg"); 
+  background-repeat: no-repeat; 
+  background-attachment: fixed;
+  min-height: 100%
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

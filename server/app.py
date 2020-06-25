@@ -1,14 +1,22 @@
-from flask import Flask, jsonify, request
-from datetime import datetime
-
-import time
-import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
+from flask import Flask, jsonify, request
+from flask_mail import Mail, Message
+from datetime import datetime
+import os, time, atexit
 
 import parroquiaDB, userDB, eucaristiaDB, semanaDB
  
 app = Flask(__name__)
- 
+
+# configuration of mail 
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'noreply.massproject@gmail.com'
+app.config['MAIL_DEFAULT_SENDER'] = 'noreply.massproject@gmail.com'
+app.config['MAIL_PASSWORD'] = os.environ['EMAILPASSWORD']
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app) 
  
 @app.route("/parroquias", methods = ['GET'])
 def getParroquias():
@@ -128,6 +136,60 @@ def generarColabCode():
 def getEucaristiaColaborador():
     NBData = request.get_json()
     return eucaristiaDB.getEucaristiaColaborador(NBData)
+     
+@app.route('/forgotUserPassword', methods = ['POST'])
+def forgotUserPassword():
+    NBData = request.get_json()
+    userInfo = userDB.recoverPassword(NBData)
+
+    if userInfo.get("email") is None:
+        return userInfo
+
+    msg = Message('Mass Project: Tu password de usuario.', recipients = [userInfo.get("email")])    
+    msg.html = """<div style="
+            font-family:Trebuchet MS, Helvetica, sans-serif;
+            color: white;
+            border-radius: 15px 50px 30px;
+            background: #89f0bc;
+            padding: 20px;
+            width: 70%;
+            margin: 0 auto;">
+                <h2>¡Hola! Tu contraseña es:</h2>
+                <p style="text-align: center; font-size: 20px;">""" + userInfo.get("password") + """</p>
+        </div>"""
+    
+    mail.send(msg)
+    obj = {"email": userInfo.get("email")} 
+    return obj
+
+@app.route('/forgotParroquiaPassword', methods = ['POST'])
+def forgotParroquiaPassword():  
+    NBData = request.get_json()
+    parroquiaInfo = parroquiaDB.recoverPassword(NBData)
+
+    if parroquiaInfo.get("email") is None:
+        return parroquiaInfo
+
+    msg = Message('Mass Project: El password de tu Parroquia.', recipients = [parroquiaInfo.get("email")])    
+    msg.html = """<div style="
+        font-family:Trebuchet MS, Helvetica, sans-serif;
+        color: white;
+        border-radius: 15px 50px 30px;
+        background: #b7e8e8;
+        padding: 20px;
+        width: 70%;
+        margin: 0 auto;">
+            <h2>¡Hola! La contraseña de la parroquia es:</h2>
+            <p style="text-align: center; font-size: 20px;">""" + parroquiaInfo.get("password") + """</p>
+    </div>"""
+    
+    mail.send(msg)
+    obj = {"email": parroquiaInfo.get("email")} 
+    return obj
+
+
+
+# Background tastks
 
 def add_semana():
     semanaDB.addSemana()

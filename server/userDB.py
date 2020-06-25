@@ -46,3 +46,21 @@ def crearUsuario(user):
     del user["_id"]
     del user["password"]
     return user
+
+def recoverPassword(data):
+    userId = data.get("userId")
+    usuario = usuarios.find_one( { "id": userId } )
+
+    if usuario is None:
+        resp = {
+            "error": "No existe un usuario con esta identificación."
+        }
+        return resp
+
+    res = {
+        "password": usuario.get("password"),
+        "email": usuario.get("email")
+    }
+
+    return res
+

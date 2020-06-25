@@ -22,6 +22,7 @@ export default class ModalMisReservas extends Component {
         ubicacion: "",
         telefono: "",
         cPassword: "",
+        email: "",
 
         authStepCompleted: false,
         errorGetReservas: "",
@@ -44,7 +45,9 @@ export default class ModalMisReservas extends Component {
         p12: "¿Ha tenido diarrea?",
         p13: "¿Ha tenido contacto en los últimos 14 días o vive con alguien sospechoso o confirmado de tener COVID-19?",
 
-        covidFormFilled: false
+        covidFormFilled: false,
+        forgotPw: false,
+        pwRecovered: false
     });
   }
 
@@ -64,12 +67,22 @@ export default class ModalMisReservas extends Component {
       this.state.ubicacion &&
       this.state.telefono &&
       !isNaN(this.state.telefono) &&
-      this.state.newUser
-      ){
+      this.state.email &&
+      this.state.newUser){
         this.setState({ authStepCompleted: true });
     }
     else{
       this.setState({ authStepCompleted: false });
+    }
+  }
+
+  checkDataPwRecover() {
+    if(this.state.id &&
+      !isNaN(this.state.id)){
+        this.setState({ authStepCompleted: true, errorAuth: "" });
+    }
+    else{
+        this.setState({ authStepCompleted: false, errorAuth: "" });
     }
   }
 
@@ -269,7 +282,10 @@ export default class ModalMisReservas extends Component {
       <div>
         <Button positive onClick={this.openModal}>Ver mis reservas</Button>
         <Modal size={size} open={open} onClose={this.close}>
-          <Modal.Header>{this.state.step < 3 ? "Mis Reservas" : "Autoevaluación COVID-19"}</Modal.Header>
+          {this.state.step < 3 && this.state.step > 0 && <Modal.Header>Mis Reservas</Modal.Header>}
+          {this.state.step === 3 && <Modal.Header>Autoevaluación COVID-19</Modal.Header>}
+          {this.state.step === 0 && <Modal.Header>Recuperar Contraseña</Modal.Header>}
+          
           <Modal.Content>
           
           {this.state.step === 1 && <Form>
@@ -319,6 +335,13 @@ export default class ModalMisReservas extends Component {
                               value={this.state.telefono}/>
                       </Form.Field>}
                       {this.state.newUser && <Form.Field required>
+                          <label>Email</label>
+                          <input
+                              placeholder='Correo electrónico' 
+                              onChange={e => this.setState({ email: e.target.value }, () => this.checkDataAuth())}
+                              value={this.state.email}/>
+                      </Form.Field>}
+                      {this.state.newUser && <Form.Field required>
                           <label>Dirección</label>
                           <input
                               placeholder='Dirección' 
@@ -358,6 +381,7 @@ export default class ModalMisReservas extends Component {
                                 nombre: this.state.nombre,
                                 direccion: this.state.direccion,
                                 telefono: this.state.telefono,
+                                email: this.state.email,
                                 ubicacion: this.state.ubicacion,
                                 reservas: []                                
                             }
@@ -420,10 +444,102 @@ export default class ModalMisReservas extends Component {
                               authStepCompleted: false, 
                               errorAuth: "" }, () => this.checkDataAuth());                              
                             }}>{this.state.newUser ? 'Estoy registrado' : 'No estoy registrado'}</List.Item>
-                          <List.Item href='#'>Olvidé mi contraseña</List.Item>
+                          <List.Item href='#'onClick={() => this.setState({forgotPw: true, id: "", step: 0})                              
+                            }>Olvidé mi contraseña</List.Item>
                       </List>
                     </Modal.Actions>
                 </Form>}
+
+                {this.state.forgotPw && <Form>
+                  
+                  {!this.state.pwdSent && !this.state.errorAuth && <Message
+                        warning
+                        header='Recuperar contraseña'
+                        content='Para recuperar tu contraseña necesitamos identificarte.'
+                        visible
+                    />}
+
+                  <Form.Field required>
+                        <label>Cédula o Tarjeta de Identidad</label>
+                        <input
+                            placeholder='Identificación (sin puntos ni espacios)' 
+                            onChange={e => this.setState({ id: e.target.value }, () => this.checkDataPwRecover())}
+                            value={this.state.id}/>
+                    </Form.Field>
+
+                    {this.state.pwdSent && <Message
+                        success
+                        header='Contraseña enviada'
+                        content={this.state.pwdSent}
+                        visible
+                    />}
+
+                    {this.state.errorAuth && <Message
+                        error
+                        header='Error'
+                        content={this.state.errorAuth}
+                        visible
+                    />}
+
+                    <Button.Group>
+                        <Button
+                        negative
+                        icon='arrow circle left'
+                        labelPosition='left'
+                        content='Volver'
+                        onClick={() => this.setState({
+                          forgotPw: false, 
+                          id: "", 
+                          step: 1, 
+                          errorAuth: "",
+                          pwdSent: "",
+                          pwRecovered: false,
+                          authStepCompleted: false
+                        })}
+                        />
+                        <Button.Or text='O'/>
+                        <Button
+                        positive
+                        icon='paper plane outline'
+                        labelPosition='right'
+                        content='Enviar'
+                        disabled={!this.state.authStepCompleted || this.state.pwRecovered}
+                        onClick={() => {
+
+                          let errorMsg = "";
+                          const authData = {
+                            "userId": this.state.id
+                          }
+
+                          fetch("/forgotUserPassword", {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(authData)
+                          }).then(res =>
+                            res.json().then(data => {
+                                if(!res.ok){
+                                    errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                    this.setState({ errorAuth: errorMsg });
+                                }
+                                else if (data.error){
+                                    errorMsg = data.error;
+                                    this.setState({ errorAuth: errorMsg });
+                                }
+                                else{
+                                  this.setState({ 
+                                    pwdSent: "Tu contraseña fue enviada a: " + data.email,
+                                    pwRecovered: true
+                                  });
+                                }
+                            })
+                          );
+
+                        }}
+                        />
+                    </Button.Group>                  
+                  </Form>}
 
                 {this.state.step === 2 && !this.state.errorGetReservas && <div>
                   <Card.Group>

@@ -161,3 +161,19 @@ def getParroquiasWithIds(ids):
     
     return obj
 
+def recoverPassword(data):
+    nit = data.get("nit")
+    parroquia = parroquias.find_one( { "nit": nit } )
+
+    if parroquia is None:
+        resp = {
+            "error": "No existe una parroquia con esta identificación."
+        }
+        return resp
+
+    res = {
+        "password": parroquia.get("password"),
+        "email": parroquia.get("email")
+    }
+
+    return res
