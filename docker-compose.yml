@@ -13,6 +13,7 @@ services:
             MONGODB_HOST: mongodb
             MONGODB_USERNAME: "apiuser"
             MONGODB_PASSWORD: "apipassword"
+            EMAILPASSWORD: "mass.project2020"
         volumes:
             - appdata:/var/www/
         depends_on: 

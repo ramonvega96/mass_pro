@@ -2,13 +2,18 @@ from pymongo import MongoClient
 import json
 from datetime import datetime
 import time
+import os
 
 # establecer conexion
-conn = MongoClient('localhost', 27017)
-conn = MongoClient()
+conn = MongoClient(
+    os.environ['MONGODB_HOST'], 
+    username=os.environ['MONGODB_USERNAME'], 
+    password=os.environ['MONGODB_PASSWORD'],
+    authSource='webapp',
+    authMechanism='SCRAM-SHA-1')
 
 # crear db
-db = conn.baseDeDatos
+db = conn.webapp
 
 # crear colecciones
 semanas = db.semanas
