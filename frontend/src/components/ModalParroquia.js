@@ -585,7 +585,7 @@ export default class ModalParroquia extends Component {
             "id": this.state.nit
         }
 
-        fetch("/getEucaristiasPorDia", {
+        fetch("/api/getEucaristiasPorDia", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -869,7 +869,7 @@ export default class ModalParroquia extends Component {
 
                         let errorMsg = ""                        
                         
-                        fetch("/generarColabCode", {
+                        fetch("/api/generarColabCode", {
                             method: "POST",
                             headers: {
                               "Content-Type": "application/json"
@@ -968,7 +968,7 @@ export default class ModalParroquia extends Component {
 
                     let errorMsg = "";
 
-                    fetch("/registrarIngreso", {
+                    fetch("/api/registrarIngreso", {
                         method: "POST",
                         headers: {
                           "Content-Type": "application/json"
@@ -1073,7 +1073,7 @@ export default class ModalParroquia extends Component {
 
                     let errorMsg = "";
 
-                    fetch("/registrarIngreso", {
+                    fetch("/api/registrarIngreso", {
                         method: "POST",
                         headers: {
                           "Content-Type": "application/json"
@@ -1093,7 +1093,7 @@ export default class ModalParroquia extends Component {
 
                                 let errorMsg = "";
 
-                                fetch("/getEucaristiaColaborador", {
+                                fetch("/api/getEucaristiaColaborador", {
                                     method: "POST",
                                     headers: {
                                       "Content-Type": "application/json"
@@ -1139,7 +1139,7 @@ export default class ModalParroquia extends Component {
 
                     let errorMsg = "";
 
-                    fetch("/getEucaristiaColaborador", {
+                    fetch("/api/getEucaristiaColaborador", {
                         method: "POST",
                         headers: {
                           "Content-Type": "application/json"
@@ -1180,7 +1180,7 @@ export default class ModalParroquia extends Component {
 
                     let errorMsg = "";
 
-                    fetch("/getEucaristiaColaborador", {
+                    fetch("/api/getEucaristiaColaborador", {
                         method: "POST",
                         headers: {
                           "Content-Type": "application/json"
@@ -1612,7 +1612,7 @@ export default class ModalParroquia extends Component {
                                 }
                             };
 
-                            fetch("/crearParroquia", {
+                            fetch("/api/crearParroquia", {
                               method: "POST",
                               headers: {
                                 "Content-Type": "application/json"
@@ -1629,7 +1629,7 @@ export default class ModalParroquia extends Component {
                                         this.setState({ errorCreando: errorMsg });
                                     }
                                     else{
-                                        fetch("/crearHorarioParroquia", {
+                                        fetch("/api/crearHorarioParroquia", {
                                             method: "POST",
                                             headers: {
                                               "Content-Type": "application/json"
@@ -1730,7 +1730,7 @@ export default class ModalParroquia extends Component {
                                 password: this.state.password
                             }
 
-                            fetch("/auth", {
+                            fetch("/api/auth", {
                                 method: "POST",
                                 headers: {
                                   "Content-Type": "application/json"
@@ -1850,7 +1850,7 @@ export default class ModalParroquia extends Component {
                             "nit": this.state.nit
                           }
 
-                          fetch("/forgotParroquiaPassword", {
+                          fetch("/api/forgotParroquiaPassword", {
                             method: "POST",
                             headers: {
                               "Content-Type": "application/json"
@@ -2212,7 +2212,7 @@ export default class ModalParroquia extends Component {
                                 }
                             };
 
-                            fetch("/editarParroquia", {
+                            fetch("/api/editarParroquia", {
                               method: "PATCH",
                               headers: {
                                 "Content-Type": "application/json"
@@ -2229,7 +2229,7 @@ export default class ModalParroquia extends Component {
                                         this.setState({ errorEditando: errorMsg });
                                     }
                                     else{
-                                        fetch("/editarHorarioParroquia", {
+                                        fetch("/api/editarHorarioParroquia", {
                                             method: "PATCH",
                                             headers: {
                                               "Content-Type": "application/json"
@@ -2311,7 +2311,7 @@ export default class ModalParroquia extends Component {
                                 password: this.state.password
                             }
 
-                            fetch("/auth", {
+                            fetch("/api/auth", {
                                 method: "POST",
                                 headers: {
                                   "Content-Type": "application/json"
@@ -2405,7 +2405,7 @@ export default class ModalParroquia extends Component {
     
                                     let errorMsg = "";
     
-                                    fetch("/getEucaristiaColaborador", {
+                                    fetch("/api/getEucaristiaColaborador", {
                                         method: "POST",
                                         headers: {
                                           "Content-Type": "application/json"
@@ -2507,7 +2507,7 @@ export default class ModalParroquia extends Component {
                             "nit": this.state.nit
                           }
 
-                          fetch("/forgotParroquiaPassword", {
+                          fetch("/api/forgotParroquiaPassword", {
                             method: "POST",
                             headers: {
                               "Content-Type": "application/json"

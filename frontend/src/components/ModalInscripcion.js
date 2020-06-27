@@ -92,7 +92,7 @@ export default class ModalInscripcion extends Component {
 
     let errorMsg = "";
 
-    fetch("/getHorarioParroquia", {
+    fetch("/api/getHorarioParroquia", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -124,7 +124,7 @@ export default class ModalInscripcion extends Component {
               
               this.setState({ horario: data.horario, horarioDisponible: true });
 
-              fetch('/getSemanas').then(response =>
+              fetch("/api/getSemanas").then(response =>
                 response.json().then(data => {
                   this.setState({ semanas: data.semanas });
                 })
@@ -330,7 +330,7 @@ export default class ModalInscripcion extends Component {
 
       let errorMsg = "";
 
-      fetch("/getEucaristias", {
+      fetch("/api/getEucaristias", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -405,7 +405,7 @@ export default class ModalInscripcion extends Component {
 
         let errorMsg = "";
         
-        fetch("/getSemana", {
+        fetch("/api/getSemana", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -534,7 +534,7 @@ export default class ModalInscripcion extends Component {
                             }
 
                             if(!this.state.newUser){
-                              fetch("/authUser", {
+                              fetch("/api/authUser", {
                                   method: "POST",
                                   headers: {
                                     "Content-Type": "application/json"
@@ -558,7 +558,7 @@ export default class ModalInscripcion extends Component {
                                 );
                             }
                             else{
-                              fetch("/createUser", {
+                              fetch("/api/createUser", {
                                 method: "POST",
                                 headers: {
                                   "Content-Type": "application/json"
@@ -660,7 +660,7 @@ export default class ModalInscripcion extends Component {
                             "userId": this.state.id
                           }
 
-                          fetch("/forgotUserPassword", {
+                          fetch("/api/forgotUserPassword", {
                             method: "POST",
                             headers: {
                               "Content-Type": "application/json"
@@ -1137,7 +1137,7 @@ export default class ModalInscripcion extends Component {
                           let day = "";
                           let hora = "";
 
-                          fetch("/crearInscripcion", {
+                          fetch("/api/crearInscripcion", {
                             method: "POST",
                             headers: {
                               "Content-Type": "application/json"

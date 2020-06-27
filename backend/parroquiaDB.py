@@ -1,12 +1,17 @@
 from pymongo import MongoClient
 import json
+import os
 
 # establecer conexion
-conn = MongoClient('localhost', 27017)
-conn = MongoClient()
+conn = MongoClient(
+    os.environ['MONGODB_HOST'], 
+    username=os.environ['MONGODB_USERNAME'], 
+    password=os.environ['MONGODB_PASSWORD'],
+    authSource='webapp',
+    authMechanism='SCRAM-SHA-1')
 
 # crear db
-db = conn.baseDeDatos
+db = conn.webapp
 
 # crear colecciones
 parroquias = db.parroquias
@@ -104,6 +109,7 @@ def getParroquias():
     
     for i in cur:
         del i["_id"]
+        del i["password"]
         res.append(i)
 
     obj = {

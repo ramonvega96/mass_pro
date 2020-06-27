@@ -98,7 +98,7 @@ export default class ModalMisReservas extends Component {
     let errorMsg = "";
     let parroquias = [];
 
-    fetch("/getEucaristiasForUser", {
+    fetch("/api/getEucaristiasForUser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -119,7 +119,7 @@ export default class ModalMisReservas extends Component {
               parroquias.indexOf(r.id.split(":")[3]) === -1 ? parroquias.push(r.id.split(":")[3]) : void(0);
             });
             
-            fetch("/getParroquiasWithIds", {
+            fetch("/api/getParroquiasWithIds", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json"
@@ -160,7 +160,7 @@ export default class ModalMisReservas extends Component {
 
     let errorMsg = "";
 
-    fetch("/deleteReserva", {
+    fetch("/api/deleteReserva", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json"
@@ -280,7 +280,7 @@ export default class ModalMisReservas extends Component {
 
     return (
       <div>
-        <Button positive onClick={this.openModal}>Ver mis reservas</Button>
+        <Button id="mis-reservas-button" positive onClick={this.openModal}>Ver mis reservas</Button>
         <Modal size={size} open={open} onClose={this.close}>
           {this.state.step < 3 && this.state.step > 0 && <Modal.Header>Mis Reservas</Modal.Header>}
           {this.state.step === 3 && <Modal.Header>Autoevaluación COVID-19</Modal.Header>}
@@ -387,7 +387,7 @@ export default class ModalMisReservas extends Component {
                             }
 
                             if(!this.state.newUser){
-                              fetch("/authUser", {
+                              fetch("/api/authUser", {
                                   method: "POST",
                                   headers: {
                                     "Content-Type": "application/json"
@@ -410,7 +410,7 @@ export default class ModalMisReservas extends Component {
                                 );
                             }
                             else{
-                              fetch("/createUser", {
+                              fetch("/api/createUser", {
                                 method: "POST",
                                 headers: {
                                   "Content-Type": "application/json"
@@ -511,7 +511,7 @@ export default class ModalMisReservas extends Component {
                             "userId": this.state.id
                           }
 
-                          fetch("/forgotUserPassword", {
+                          fetch("/api/forgotUserPassword", {
                             method: "POST",
                             headers: {
                               "Content-Type": "application/json"
@@ -1031,7 +1031,7 @@ export default class ModalMisReservas extends Component {
 
                             var errorMsg = "";
 
-                            fetch("/postUserCovidForm", {
+                            fetch("/api/postUserCovidForm", {
                               method: "POST",
                               headers: {
                                 "Content-Type": "application/json"

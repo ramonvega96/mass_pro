@@ -5,7 +5,8 @@ from datetime import datetime
 import os, time, atexit
 
 import parroquiaDB, userDB, eucaristiaDB, semanaDB
- 
+
+
 app = Flask(__name__)
 
 # configuration of mail 
@@ -18,126 +19,126 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app) 
  
-@app.route("/parroquias", methods = ['GET'])
+@app.route("/api/parroquias", methods = ['GET'])
 def getParroquias():
     response = jsonify(parroquiaDB.getParroquias())
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
  
-@app.route('/crearParroquia', methods = ['POST'])
+@app.route('/api/crearParroquia', methods = ['POST'])
 def crearParroquia():
     # Insertar parroquia en la DB
     NBData = request.get_json()
     response = jsonify(parroquiaDB.crearParroquia(NBData))
     return response
 
-@app.route('/editarParroquia', methods = ['PATCH'])
+@app.route('/api/editarParroquia', methods = ['PATCH'])
 def editarParroquia():
     # Editar parroquia en la DB
     NBData = request.get_json()
     return parroquiaDB.editarParroquia(NBData)
 
-@app.route('/crearHorarioParroquia', methods = ['POST'])
+@app.route('/api/crearHorarioParroquia', methods = ['POST'])
 def crearHorarioParroquia():
     # Insertar horario parroquia en la DB
     NBData = request.get_json()
     return parroquiaDB.crearHorarioParroquia(NBData)
 
-@app.route('/editarHorarioParroquia', methods = ['PATCH'])
+@app.route('/api/editarHorarioParroquia', methods = ['PATCH'])
 def editarHorarioParroquia():
     # Insertar horario parroquia en la DB
     NBData = request.get_json()
     return parroquiaDB.editarHorarioParroquia(NBData)
 
-@app.route('/auth', methods = ['POST'])
+@app.route('/api/auth', methods = ['POST'])
 def autenticarParroquia():
     # Autenticacion con nit y password
     NBData = request.get_json()
     return parroquiaDB.autenticarParroquia(NBData)
 
-@app.route('/authUser', methods = ['POST'])
+@app.route('/api/authUser', methods = ['POST'])
 def autenticarUsuario():
     # Autenticacion con id y password
     NBData = request.get_json()
     return userDB.autenticarUsuario(NBData)
 
-@app.route('/createUser', methods = ['POST'])
+@app.route('/api/createUser', methods = ['POST'])
 def crearUsuario():
     # Autenticacion con id y password
     NBData = request.get_json()
     return userDB.crearUsuario(NBData)
 
-@app.route('/getHorarioParroquia', methods = ['POST'])
+@app.route('/api/getHorarioParroquia', methods = ['POST'])
 def getHorarioParroquia():
     # Get horario parroquia con nit
     NBData = request.get_json()
     return parroquiaDB.getHorarioParroquia(NBData)
 
-@app.route('/crearInscripcion', methods = ['POST'])
+@app.route('/api/crearInscripcion', methods = ['POST'])
 def crearInscripcion():
     # Crear inscripcion en una misa de una parroquia
     NBData = request.get_json()
     return eucaristiaDB.crearInscripcion(NBData)
 
-@app.route('/getEucaristias', methods = ['POST'])
+@app.route('/api/getEucaristias', methods = ['POST'])
 def getEucaristias():
     # Get eucaristias de una parroquia
     NBData = request.get_json()
     return eucaristiaDB.getEucaristias(NBData)
 
-@app.route('/getEucaristiasForUser', methods = ['POST'])
+@app.route('/api/getEucaristiasForUser', methods = ['POST'])
 def getEucaristiasForUser():
     # Get eucaristias para un usuario especifico - sus reservas
     NBData = request.get_json()
     return eucaristiaDB.getEucaristiasForUser(NBData)
 
-@app.route('/getSemanas', methods = ['GET'])
+@app.route('/api/getSemanas', methods = ['GET'])
 def getSemanas():
     response = jsonify(semanaDB.getSemanas())
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
-@app.route('/deleteReserva', methods = ['PATCH'])
+@app.route('/api/deleteReserva', methods = ['PATCH'])
 def deleteReserva():
     NBData = request.get_json()
     return eucaristiaDB.deleteReserva(NBData)
 
-@app.route('/getEucaristiasPorDia', methods = ['POST'])
+@app.route('/api/getEucaristiasPorDia', methods = ['POST'])
 def getEucaristiasPorDia():
     NBData = request.get_json()
     return eucaristiaDB.getEucaristiasPorDia(NBData)
 
-@app.route('/getParroquiasWithIds', methods = ['POST'])
+@app.route('/api/getParroquiasWithIds', methods = ['POST'])
 def getParroquiasWithIds():
     NBData = request.get_json()
     return parroquiaDB.getParroquiasWithIds(NBData)
 
-@app.route('/postUserCovidForm', methods = ['POST'])
+@app.route('/api/postUserCovidForm', methods = ['POST'])
 def postUserCovidForm():
     NBData = request.get_json()
     return eucaristiaDB.postUserCovidForm(NBData)
 
-@app.route('/getSemana', methods = ['POST'])
+@app.route('/api/getSemana', methods = ['POST'])
 def getSemana():
     NBData = request.get_json()
     return semanaDB.getSemana(NBData)
 
-@app.route('/registrarIngreso', methods = ['POST'])
+@app.route('/api/registrarIngreso', methods = ['POST'])
 def registrarIngreso():
     NBData = request.get_json()
     return eucaristiaDB.registrarIngreso(NBData)
 
-@app.route('/generarColabCode', methods = ['POST'])
+@app.route('/api/generarColabCode', methods = ['POST'])
 def generarColabCode():
     NBData = request.get_json()
     return eucaristiaDB.generarColabCode(NBData)
 
-@app.route('/getEucaristiaColaborador', methods = ['POST'])
+@app.route('/api/getEucaristiaColaborador', methods = ['POST'])
 def getEucaristiaColaborador():
     NBData = request.get_json()
     return eucaristiaDB.getEucaristiaColaborador(NBData)
      
-@app.route('/forgotUserPassword', methods = ['POST'])
+@app.route('/api/forgotUserPassword', methods = ['POST'])
 def forgotUserPassword():
     NBData = request.get_json()
     userInfo = userDB.recoverPassword(NBData)
@@ -162,7 +163,7 @@ def forgotUserPassword():
     obj = {"email": userInfo.get("email")} 
     return obj
 
-@app.route('/forgotParroquiaPassword', methods = ['POST'])
+@app.route('/api/forgotParroquiaPassword', methods = ['POST'])
 def forgotParroquiaPassword():  
     NBData = request.get_json()
     parroquiaInfo = parroquiaDB.recoverPassword(NBData)
@@ -204,3 +205,6 @@ scheduler.start()
 
 # Shut down the scheduler when exiting the app
 atexit.register(lambda: scheduler.shutdown())
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
