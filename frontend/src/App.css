@@ -18,21 +18,21 @@
   margin: 0px !important;
 }
 
-#date-picker-dialog-asistencia{
+#date-picker-dialog-asistencia {
   border: 0px;
   text-align: center;
 }
 
-#date-picker-dialog-reportes{
+#date-picker-dialog-reportes {
   border: 0px;
   text-align: center;
 }
 
-#auto-eval-covid{
+#auto-eval-covid {
   margin-bottom: 1em;
 }
 
-.ui.positive.button {
+#mis-reservas-button {
   margin: 0px 0px 1em 0px;
 }
 

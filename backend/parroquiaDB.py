@@ -109,6 +109,7 @@ def getParroquias():
     
     for i in cur:
         del i["_id"]
+        del i["password"]
         res.append(i)
 
     obj = {

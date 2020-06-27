@@ -12,7 +12,7 @@ function App() {
   const [filteredParroquias, setFilteredParroquias] = useState([]);
 
   useEffect(() => {
-    fetch('/parroquias').then(response =>
+    fetch("/api/parroquias").then(response =>
       response.json().then(data => {
         setParroquias(data.parroquias);
         setFilteredParroquias(data.parroquias);
