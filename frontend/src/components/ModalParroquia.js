@@ -1646,8 +1646,7 @@ export default class ModalParroquia extends Component {
                                                       this.setState({ errorCreando: errorMsg });
                                                   }
                                                   else{
-                                                    this.props.onNewParroquia(parroquia);
-                                                    this.setState({ horarioStepCompleted: true });
+                                                    this.setState({ horarioStepCompleted: true, step: 3 });
                                                   }
                                               })
                                             );
@@ -1658,6 +1657,26 @@ export default class ModalParroquia extends Component {
                         />
                     </Button.Group>
                 </Form>}
+
+                {this.state.horarioStepCompleted && this.state.step === 3 && <Form>
+                    <Message
+                        positive
+                        header='¡Solicitud Enviada!'
+                        content='Recibimos tú solicitud de inscripción. Una vez procesada, se enviará un email de confirmación al correo de la Parroquia.'
+                        icon='paper plane'
+                        visible
+                    />    
+                    <Button.Group>
+                        <Button
+                        positive
+                        icon='smile outline'
+                        labelPosition='left'
+                        content='¡Listo!'
+                        onClick={this.close}
+                        />
+                    </Button.Group>                
+                </Form>}
+
             </Modal.Content>
         </Modal>
 

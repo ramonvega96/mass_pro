@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import json
 import os
+import time
 
 # establecer conexion
 conn = MongoClient(
@@ -27,7 +28,10 @@ def crearParroquia(parroquia):
         }
         return resp
     
+    parroquia["available"] = False
+    parroquia["fechaInscripcion"] = int(time.time())
     parroquias.insert(parroquia)
+    
     del parroquia["_id"]
     return parroquia
 
@@ -103,9 +107,9 @@ def editarHorarioParroquia(newHorario):
     return newHorario
 
 # get todas las parroquias
-def getParroquias():
+def getParroquias(avail=True):
     res = []
-    cur = parroquias.find({})
+    cur = parroquias.find({ "available": avail })
     
     for i in cur:
         del i["_id"]
@@ -179,6 +183,39 @@ def recoverPassword(data):
 
     res = {
         "password": parroquia.get("password"),
+        "email": parroquia.get("email")
+    }
+
+    return res
+
+def enableParroquia(data):
+    nit = data.get("nit")
+    enable = data.get("enable")
+    reason = data.get("reason")
+
+    parroquia = parroquias.find_one( { "nit": nit } )
+
+    msg = ""
+
+    if enable:
+        parroquias.update(
+            {"nit": nit},
+            {"$set": 
+                {
+                    "available": enable
+                }
+            }
+        )
+        msg = "La inscripción de la parroquia se realizó con éxito. Ya se encuentra disponible dentro de nuestra plataforma"
+    
+    else:
+        parroquias.delete_one({"nit": nit})
+        horarios.delete_one({"nit": nit})
+        msg = "Error en la inscripción. Motivo: " + reason
+
+    res = {
+        "enabled": enable,
+        "msg": msg,
         "email": parroquia.get("email")
     }
 

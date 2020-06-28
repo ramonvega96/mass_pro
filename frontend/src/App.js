@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import './App.css';
 import { Input } from 'semantic-ui-react'
 import ModalParroquia from './components/ModalParroquia';
 import Parroquias from './components/Parroquias';
 import ModalMisReservas from './components/ModalMisReservas';
+import AdminModule from './components/AdminModule';
 
 
 function App() {
@@ -43,11 +45,6 @@ function App() {
     setFilteredParroquias(currentParroquias => [parroquia, ...currentParroquias]);
   }
 
-  function refreshOnAdd(parroquia){
-    setFilteredParroquias(currentParroquias => [parroquia, ...currentParroquias]);
-    setParroquias(currentParroquias => [parroquia, ...currentParroquias]);
-  }
-
   function Footer({ children }) {
     return (
       <div>
@@ -56,15 +53,30 @@ function App() {
       </div>
     );
   }
+
+  const IndexPage = () => {
+    return <div className="App" >
+      <Input fluid icon='search' placeholder='Busca tu parroquia por su nombre!' onChange={e => setFilteredValues(e.target.value)}/>
+      <ModalMisReservas />
+      <Parroquias parroquias={filteredParroquias}/>
+      <Footer>
+        <ModalParroquia onParroquiaChange={p => refreshOnEdit(p)}/>
+      </Footer>
+    </div>;
+  };
   
-  return <div className="App" >
-    <Input fluid icon='search' placeholder='Busca tu parroquia por su nombre!' onChange={e => setFilteredValues(e.target.value)}/>
-    <ModalMisReservas />
-    <Parroquias parroquias={filteredParroquias}/>
-    <Footer>
-      <ModalParroquia onNewParroquia={p => refreshOnAdd(p)} onParroquiaChange={p => refreshOnEdit(p)}/>
-    </Footer>
-  </div>;
+  const adminModulePage = () => {
+    return <AdminModule />;
+  };
+
+  return (
+    <section className="App">
+      <Router>
+        <Route exact path="/" component={IndexPage} />
+        <Route exact path="/adminModule" component={adminModulePage} />
+      </Router>
+    </section>
+  );
 }
 
 export default App;
