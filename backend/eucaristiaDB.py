@@ -421,7 +421,7 @@ def disable_eucaristias():
     dia = int(i.get("dia"))
     
     try:
-      full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 1, dia, hour, minute).timestamp()) + 3600
+      full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 1, dia, hour, minute).timestamp()) + 3600 * 6
 
     except:
       dias_restados = 1  
@@ -430,9 +430,9 @@ def disable_eucaristias():
         try:
           full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 1, dia - dias_restados, hour, minute).timestamp())
           try:
-            full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 2, dias_restados, hour, minute).timestamp()) + 3600
+            full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 2, dias_restados, hour, minute).timestamp()) + 3600 * 6
           except:
-            full_date = int(datetime(int(i.get("year")) + 1, 1, dias_restados, hour, minute).timestamp()) + 3600
+            full_date = int(datetime(int(i.get("year")) + 1, 1, dias_restados, hour, minute).timestamp()) + 3600 * 6
         
         except:
           full_date = 0
