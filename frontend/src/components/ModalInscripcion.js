@@ -1086,6 +1086,7 @@ export default class ModalInscripcion extends Component {
                                   <Card.Content>
                                       <Card.Header>{dias.find(obj => {return obj.value === h.split(":")[1]}).text}</Card.Header> 
                                       <Card.Meta>{horariosAm.concat(horariosPm).find(obj => {return obj.key === h.split(":")[0]}).text}</Card.Meta>
+                                      <Card.Meta>{this.state.semanas.find(obj => {return obj.value === h.split(":")[2]}).status === "current" ? "Esta semana" : "Próxima semana"}</Card.Meta>
                                   </Card.Content>
                                   <Card.Content extra>
                                     <div className='ui buttons'>

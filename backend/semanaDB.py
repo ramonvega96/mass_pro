@@ -25,7 +25,6 @@ def getSemanas():
     
     for i in cur:
         del i["_id"]
-        i["text"] = "hola"
         res.append(i)
 
     obj = {"semanas": res}
