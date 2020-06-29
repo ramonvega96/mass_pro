@@ -422,11 +422,32 @@ def disable_eucaristias():
     print(int(i.get("dia")))
     print(int(i.get("mes")) + 1)
     print(int(i.get("year")))
+
+    full_date = 0
+    dia = int(i.get("dia"))
     
-    full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 1, int(i.get("dia")), hour, minute).timestamp()) + 3600
-    
+    try:
+      full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 1, dia, hour, minute).timestamp()) + 3600
+
+    except:
+      dias_restados = 1  
+      while full_date == 0:
+        
+        try:
+          full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 1, dia - dias_restados, hour, minute).timestamp())
+          try:
+            full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 2, dias_restados, hour, minute).timestamp()) + 3600
+          except:
+            full_date = int(datetime(int(i.get("year")) + 1, 1, dias_restados, hour, minute).timestamp()) + 3600
+        
+        except:
+          full_date = 0
+          dias_restados += 1
+
+    print(full_date)
     if full_date < current_time:
-      to_update.append(i.get("id"))
+      print(full_date)
+      # to_update.append(i.get("id"))
   
   
   if len(to_update) > 0:
@@ -438,4 +459,5 @@ def disable_eucaristias():
             }
         }, multi=True
     )
+
     print("[" + datetime.today().strftime('%Y-%m-%d-%H:%M:%S') + "]: Old eucaristias marked as unavailable.")
