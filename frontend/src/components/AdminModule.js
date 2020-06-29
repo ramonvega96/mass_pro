@@ -228,6 +228,7 @@ export default class ModalMisReservas extends Component {
                               <Card.Meta>Diocesis: {parroquia.diocesis}</Card.Meta>
                               <Card.Meta>{parroquia.direccion}</Card.Meta>
                               <Card.Meta>{parroquia.telefono}</Card.Meta>
+                              <Card.Meta>Nit: {parroquia.nit}</Card.Meta>
                               <Card.Description>
                               <strong>{parroquia.parroco}</strong>
                               </Card.Description>
