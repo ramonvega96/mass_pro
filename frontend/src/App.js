@@ -23,7 +23,7 @@ function App() {
   }, []);
 
   function setFilteredValues(val){
-    setFilteredParroquias(parroquias.filter(p => p.nombre.toLowerCase().includes(val)))
+    setFilteredParroquias(parroquias.filter(p => p.nombre.toLowerCase().includes(val.toLowerCase())));
   }
 
   function refreshOnEdit(newParroquia){

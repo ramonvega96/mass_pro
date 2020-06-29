@@ -34,7 +34,7 @@ def getSemanas():
 
 # get semana with date
 def getSemana(data):
-    fecha = datetime(data.get("year"), data.get("month") + 1, data.get("day")).timestamp()
+    fecha = int(datetime(data.get("year"), data.get("month") + 1, data.get("day")).timestamp())
 
     week = semanas.find_one( {"$and":[ 
         { "initTs": { "$lte": fecha } }, 
