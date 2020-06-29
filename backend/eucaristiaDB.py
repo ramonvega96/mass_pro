@@ -409,7 +409,7 @@ def getEucaristiaColaborador(data):
 
 def disable_eucaristias():
   print("[" + datetime.today().strftime('%Y-%m-%d-%H:%M:%S') + "]: Health check disable_eucaristias.")
-  current_time = time.time()
+  current_time = int(time.time())
   eucaristias = eucaristias_db.find( { "available": True } )
   to_update = []
 
@@ -439,6 +439,8 @@ def disable_eucaristias():
           dias_restados += 1
 
     if full_date < current_time:
+      print(full_date)
+      print(current_time)
       to_update.append(i.get("id"))
   
   
