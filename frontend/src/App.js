@@ -56,7 +56,6 @@ function App() {
 
   const IndexPage = () => {
     return <div className="App" >
-      <Input fluid icon='search' placeholder='Busca tu parroquia por su nombre!' onChange={e => setFilteredValues(e.target.value)}/>
       <ModalMisReservas />
       <Parroquias parroquias={filteredParroquias}/>
       <Footer>
@@ -71,6 +70,7 @@ function App() {
 
   return (
     <section className="App">
+      <Input fluid icon='search' placeholder='Busca tu parroquia por su nombre!' onChange={e => setFilteredValues(e.target.value)}/>
       <Router>
         <Route exact path="/" component={IndexPage} />
         <Route exact path="/adminModule" component={adminModulePage} />
