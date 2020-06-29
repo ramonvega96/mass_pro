@@ -416,12 +416,6 @@ def disable_eucaristias():
   for i in eucaristias:
     hour = math.floor(int(i.get("id").split(":")[0])/100)
     minute = 30 if i.get("id").split(":")[0].endswith("30") else 0
-    
-    print(minute)
-    print(hour)
-    print(int(i.get("dia")))
-    print(int(i.get("mes")) + 1)
-    print(int(i.get("year")))
 
     full_date = 0
     dia = int(i.get("dia"))
@@ -444,10 +438,8 @@ def disable_eucaristias():
           full_date = 0
           dias_restados += 1
 
-    print(full_date)
     if full_date < current_time:
-      print(full_date)
-      # to_update.append(i.get("id"))
+      to_update.append(i.get("id"))
   
   
   if len(to_update) > 0:

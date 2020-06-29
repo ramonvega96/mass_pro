@@ -264,7 +264,7 @@ def disable_eucaristias():
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=add_semana, trigger="interval", seconds=3600)
-scheduler.add_job(func=disable_eucaristias, trigger="interval", seconds=15)
+scheduler.add_job(func=disable_eucaristias, trigger="interval", seconds=600)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
