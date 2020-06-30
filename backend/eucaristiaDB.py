@@ -439,8 +439,6 @@ def disable_eucaristias():
           dias_restados += 1
 
     if full_date < current_time:
-      print(full_date)
-      print(current_time)
       to_update.append(i.get("id"))
   
   
