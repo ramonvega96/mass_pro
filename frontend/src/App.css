@@ -36,6 +36,14 @@
   margin: 0px 0px 1em 0px;
 }
 
+#soy-admin-button {
+  margin: 3em 0px 1em 0px;
+}
+
+#solicitudes-pendientes {
+  padding: 3em 0px 1em 0px;
+}
+
 .footerStyle {
   background-color: white;
   font-size: 20px;

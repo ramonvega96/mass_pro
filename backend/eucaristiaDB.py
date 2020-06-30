@@ -409,16 +409,38 @@ def getEucaristiaColaborador(data):
 
 def disable_eucaristias():
   print("[" + datetime.today().strftime('%Y-%m-%d-%H:%M:%S') + "]: Health check disable_eucaristias.")
-  current_time = time.time()
+  current_time = int(time.time())
   eucaristias = eucaristias_db.find( { "available": True } )
   to_update = []
 
   for i in eucaristias:
     hour = math.floor(int(i.get("id").split(":")[0])/100)
     minute = 30 if i.get("id").split(":")[0].endswith("30") else 0
-    full_date = datetime(i.get("year"), i.get("mes") + 1, i.get("dia"), hour, minute).timestamp() + 3600
+
+    full_date = 0
+    dia = int(i.get("dia"))
     
+    try:
+      full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 1, dia, hour, minute).timestamp()) + 3600 * 6
+
+    except:
+      dias_restados = 1  
+      while full_date == 0:
+        
+        try:
+          full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 1, dia - dias_restados, hour, minute).timestamp())
+          try:
+            full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 2, dias_restados, hour, minute).timestamp()) + 3600 * 6
+          except:
+            full_date = int(datetime(int(i.get("year")) + 1, 1, dias_restados, hour, minute).timestamp()) + 3600 * 6
+        
+        except:
+          full_date = 0
+          dias_restados += 1
+
     if full_date < current_time:
+      print(full_date)
+      print(current_time)
       to_update.append(i.get("id"))
   
   
@@ -431,4 +453,5 @@ def disable_eucaristias():
             }
         }, multi=True
     )
+
     print("[" + datetime.today().strftime('%Y-%m-%d-%H:%M:%S') + "]: Old eucaristias marked as unavailable.")

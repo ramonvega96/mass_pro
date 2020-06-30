@@ -24,12 +24,36 @@ def getParroquias():
     response = jsonify(parroquiaDB.getParroquias())
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
+@app.route("/api/unavailParroquias", methods = ['GET'])
+def unavailParroquias():
+    response = jsonify(parroquiaDB.getParroquias(avail=False))
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
  
 @app.route('/api/crearParroquia', methods = ['POST'])
 def crearParroquia():
     # Insertar parroquia en la DB
     NBData = request.get_json()
-    response = jsonify(parroquiaDB.crearParroquia(NBData))
+    response = parroquiaDB.crearParroquia(NBData)
+
+    if response.get("nombre") is not None:
+        
+        msg = Message('Protocol Meet: Verificar Parroquia', recipients = ["csalazar@coquizables.com"])    
+        msg.html = """<div style="
+                font-family:Trebuchet MS, Helvetica, sans-serif;
+                color: white;
+                border-radius: 15px 50px 30px;
+                background: #ded759;
+                padding: 20px;
+                width: 70%;
+                margin: 0 auto;">
+                    <h2>¡Hola! Se registró una nueva parroquia:</h2>
+                    <p style="text-align: center; font-size: 20px;">""" + response.get("nombre") + """</p>
+            </div>"""
+        
+        mail.send(msg)
+
     return response
 
 @app.route('/api/editarParroquia', methods = ['PATCH'])
@@ -146,7 +170,7 @@ def forgotUserPassword():
     if userInfo.get("email") is None:
         return userInfo
 
-    msg = Message('Mass Project: Tu password de usuario.', recipients = [userInfo.get("email")])    
+    msg = Message('Protocol Meet: Tu password de usuario.', recipients = [userInfo.get("email")])    
     msg.html = """<div style="
             font-family:Trebuchet MS, Helvetica, sans-serif;
             color: white;
@@ -158,8 +182,14 @@ def forgotUserPassword():
                 <h2>¡Hola! Tu contraseña es:</h2>
                 <p style="text-align: center; font-size: 20px;">""" + userInfo.get("password") + """</p>
         </div>"""
+
+    try:
+        mail.send(msg)
+    except:
+        return {
+            "error": "El correo que proporcionaste al inscribirte, no es un correo válido. Ponte en contacto con nosotros."
+        }    
     
-    mail.send(msg)
     obj = {"email": userInfo.get("email")} 
     return obj
 
@@ -171,7 +201,7 @@ def forgotParroquiaPassword():
     if parroquiaInfo.get("email") is None:
         return parroquiaInfo
 
-    msg = Message('Mass Project: El password de tu Parroquia.', recipients = [parroquiaInfo.get("email")])    
+    msg = Message('Protocol Meet: El password de tu Parroquia.', recipients = [parroquiaInfo.get("email")])    
     msg.html = """<div style="
         font-family:Trebuchet MS, Helvetica, sans-serif;
         color: white;
@@ -183,9 +213,43 @@ def forgotParroquiaPassword():
             <h2>¡Hola! La contraseña de la parroquia es:</h2>
             <p style="text-align: center; font-size: 20px;">""" + parroquiaInfo.get("password") + """</p>
     </div>"""
-    
-    mail.send(msg)
+
+    try:
+        mail.send(msg)
+    except:
+        return {
+            "error": "El correo que proporcionaste al inscribirte, no es un correo válido. Ponte en contacto con nosotros."
+        } 
+
     obj = {"email": parroquiaInfo.get("email")} 
+    return obj
+
+@app.route('/api/enableParroquia', methods = ['POST'])
+def enableParroquia():  
+    NBData = request.get_json()
+    ans = parroquiaDB.enableParroquia(NBData)
+    color = """#80ed72; """ if ans.get("enabled") else """#e36666; """
+
+    msg = Message('Protocol Meet: Inscripción Parroquia.', recipients = [ans.get("email")])    
+    msg.html = """<div style="
+        font-family:Trebuchet MS, Helvetica, sans-serif;
+        color: white;
+        border-radius: 15px 50px 30px;
+        background:""" + color + """padding: 20px;
+        width: 70%;
+        margin: 0 auto;">
+            <h2>¡Hola! Resultado inscripción Parroquia:</h2>
+            <p style="text-align: center; font-size: 20px; color: white;">""" + ans.get("msg") + """</p>
+    </div>"""
+    
+    try:
+        mail.send(msg)
+    except:
+        return {
+            "error": "El correo de la parroquia, no es un correo válido."
+        }
+
+    obj = {"email": ans.get("email")} 
     return obj
 
 
@@ -200,7 +264,7 @@ def disable_eucaristias():
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=add_semana, trigger="interval", seconds=3600)
-scheduler.add_job(func=disable_eucaristias, trigger="interval", seconds=900)
+scheduler.add_job(func=disable_eucaristias, trigger="interval", seconds=600)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
