@@ -1256,7 +1256,7 @@ export default class ModalParroquia extends Component {
             <List.Item href='#' onClick={this.showDownloadList}>Asistencia</List.Item>
         </List>
 
-        <Modal size={size} open={openInscribir} onClose={this.close}>
+        <Modal size={size} open={openInscribir} onClose={this.close} closeOnEscape={false} closeOnDimmerClick={false}>
             <Modal.Header>Agregar Parroquia</Modal.Header>
             
             <Step.Group> 
@@ -1680,7 +1680,7 @@ export default class ModalParroquia extends Component {
             </Modal.Content>
         </Modal>
 
-        <Modal size={size} open={openEditar} onClose={this.close}>
+        <Modal size={size} open={openEditar} onClose={this.close} closeOnEscape={false} closeOnDimmerClick={false}>
             <Modal.Header>Editar Parroquia</Modal.Header>
             
             {this.state.step > 1 && <Step.Group>
@@ -2280,7 +2280,7 @@ export default class ModalParroquia extends Component {
             </Modal.Content>
         </Modal>
 
-        <Modal size={size} open={openDownloadList} onClose={this.close} closeIcon>
+        <Modal size={size} open={openDownloadList} onClose={this.close} closeIcon closeOnEscape={false} closeOnDimmerClick={false}>
             <Modal.Header>Asistencia</Modal.Header>          
 
             <Modal.Content>

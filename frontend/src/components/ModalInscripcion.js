@@ -432,7 +432,7 @@ export default class ModalInscripcion extends Component {
 
     return (
       <div>
-        <Modal size={size} open={open} onClose={this.close}>
+        <Modal size={size} open={open} onClose={this.close} closeOnEscape={false} closeOnDimmerClick={false}>
           <Modal.Header>{this.state.step > 0 ? "Reservar Cupo" : "Recuperar Contraseña"}</Modal.Header>
           <Modal.Content>
           

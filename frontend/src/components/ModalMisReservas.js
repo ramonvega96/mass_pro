@@ -281,7 +281,7 @@ export default class ModalMisReservas extends Component {
     return (
       <div>
         <Button id="mis-reservas-button" positive onClick={this.openModal}>Ver mis reservas</Button>
-        <Modal size={size} open={open} onClose={this.close}>
+        <Modal size={size} open={open} onClose={this.close} closeOnEscape={false} closeOnDimmerClick={false}>
           {this.state.step < 3 && this.state.step > 0 && <Modal.Header>Mis Reservas</Modal.Header>}
           {this.state.step === 3 && <Modal.Header>Autoevaluación COVID-19</Modal.Header>}
           {this.state.step === 0 && <Modal.Header>Recuperar Contraseña</Modal.Header>}

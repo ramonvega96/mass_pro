@@ -63,7 +63,7 @@ export default class ModalMisReservas extends Component {
     return (
       <div>
         {!this.state.usuario && <Button id="soy-admin-button" positive onClick={this.openModal}>Soy Administrador</Button>}
-        <Modal size={size} open={open} onClose={this.close}>
+        <Modal size={size} open={open} onClose={this.close} closeOnEscape={false} closeOnDimmerClick={false}>
           
         {this.state.step === 1 && <Modal.Header>Autenticación Administrador</Modal.Header>}
         {this.state.step === 0 && <Modal.Header>Motivo del Rechazo</Modal.Header>}
