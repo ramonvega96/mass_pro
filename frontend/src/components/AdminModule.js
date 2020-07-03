@@ -63,7 +63,7 @@ export default class ModalMisReservas extends Component {
     return (
       <div>
         {!this.state.usuario && <Button id="soy-admin-button" positive onClick={this.openModal}>Soy Administrador</Button>}
-        <Modal size={size} open={open} onClose={this.close}>
+        <Modal size={size} open={open} onClose={this.close} closeOnEscape={false} closeOnDimmerClick={false}>
           
         {this.state.step === 1 && <Modal.Header>Autenticación Administrador</Modal.Header>}
         {this.state.step === 0 && <Modal.Header>Motivo del Rechazo</Modal.Header>}
@@ -83,7 +83,8 @@ export default class ModalMisReservas extends Component {
                         <input
                             placeholder='Identificación (sin puntos ni espacios)' 
                             onChange={e => this.setState({ id: e.target.value }, () => this.checkDataAuth())}
-                            value={this.state.id}/>
+                            value={this.state.id}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Field required>
                         <label>Contraseña</label>
@@ -91,7 +92,8 @@ export default class ModalMisReservas extends Component {
                             type='password'
                             placeholder='Contraseña' 
                             onChange={e => this.setState({ password: e.target.value }, () => this.checkDataAuth())}
-                            value={this.state.password}/>
+                            value={this.state.password}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
 
                     <Button.Group>

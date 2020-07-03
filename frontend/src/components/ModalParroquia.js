@@ -909,6 +909,7 @@ export default class ModalParroquia extends Component {
                 placeholder='Identificación (sin puntos ni espacios)'
                 value={this.state.asistenteId} 
                 onChange={e => {lookForAsistente(e.target.value)}}
+                onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}
                 />
         </Form.Field>}
 
@@ -939,6 +940,7 @@ export default class ModalParroquia extends Component {
                         <input 
                         disabled={this.state.asistente.covidForm ? false : true} 
                         onChange={e => handleChangeTemperatura(e.target.value)}
+                        onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}
                         />
                     </Table.Cell>
                 </Table.Row>
@@ -1014,6 +1016,7 @@ export default class ModalParroquia extends Component {
                 placeholder='Identificación (sin puntos ni espacios)'
                 value={this.state.asistenteId} 
                 onChange={e => {lookForAsistente(e.target.value)}}
+                onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}
                 />
         </Form.Field>
 
@@ -1044,6 +1047,7 @@ export default class ModalParroquia extends Component {
                         <input 
                         disabled={this.state.asistente.covidForm ? false : true} 
                         onChange={e => handleChangeTemperatura(e.target.value)}
+                        onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}
                         />
                     </Table.Cell>
                 </Table.Row>
@@ -1256,7 +1260,7 @@ export default class ModalParroquia extends Component {
             <List.Item href='#' onClick={this.showDownloadList}>Asistencia</List.Item>
         </List>
 
-        <Modal size={size} open={openInscribir} onClose={this.close}>
+        <Modal size={size} open={openInscribir} onClose={this.close} closeOnEscape={false} closeOnDimmerClick={false}>
             <Modal.Header>Agregar Parroquia</Modal.Header>
             
             <Step.Group> 
@@ -1285,56 +1289,64 @@ export default class ModalParroquia extends Component {
                         <input
                             placeholder='Diocesis a la que pertenece' 
                             onChange={e => this.setState({ diocesis: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.diocesis}/>
+                            value={this.state.diocesis}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Field required>
                         <label>Ubicación: Ciudad / Municipio</label>
                         <input
                             placeholder='Ciudad / Municipio donde se encuentra' 
                             onChange={e => this.setState({ ubicacion: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.ubicacion}/>
+                            value={this.state.ubicacion}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>                          
                     <Form.Field required>
                         <label>Nombre de la Parroquia</label>
                         <input
                             placeholder='Nombre Parroquia' 
                             onChange={e => this.setState({ nombre: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.nombre}/>
+                            value={this.state.nombre}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Field required>
                         <label>Nombre del Parroco</label>
                         <input
                             placeholder='Nombre Parroco' 
                             onChange={e => this.setState({ parroco: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.parroco}/>
+                            value={this.state.parroco}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Field required>
                         <label>Número de Teléfono de la Parroquia</label>
                         <input
                             placeholder='Número de Teléfono (sin puntos, guiones o espacios)' 
                             onChange={e => this.setState({ telefono: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.telefono}/>
+                            value={this.state.telefono}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Field required>
                         <label>Email</label>
                         <input
                             placeholder='Correo Electrónico' 
                             onChange={e => this.setState({ email: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.email}/>
+                            value={this.state.email}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field> 
                     <Form.Field required>
                         <label>Dirección de la Parroquia</label>
                         <input 
                             placeholder='Dirección Parroquia' 
                             onChange={e => this.setState({ direccion: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.direccion}/>
+                            value={this.state.direccion}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Field required>
                         <label>Capacidad de la Parroquia - Considere restricciones de aforo COVID</label>
                         <input 
                             placeholder='Capacidad Parroquia (Número de personas - Considerando restricciones de aforo COVID)' 
                             onChange={e => this.setState({ capacidad: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.capacidad}/>
+                            value={this.state.capacidad}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Group widths='equal'>
                         <Form.Field required>
@@ -1342,7 +1354,8 @@ export default class ModalParroquia extends Component {
                             <input 
                                 placeholder='Nit Parroquia (sin puntos, guiones o espacios)' 
                                 onChange={e => this.setState({ nit: e.target.value }, () => this.checkDataParroquia())}
-                                value={this.state.nit}/>
+                                value={this.state.nit}
+                                onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                         </Form.Field>
                         <Form.Field>
                             <label id='auto-eval-covid'>¿Habilitar autoevaluación COVID?</label>
@@ -1360,7 +1373,8 @@ export default class ModalParroquia extends Component {
                                 type='password' 
                                 placeholder='Escoja una contraseña'
                                 onChange={e => this.setState({ password: e.target.value }, () => this.checkDataParroquia())}
-                                value={this.state.password}/>
+                                value={this.state.password}
+                                onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                         </Form.Field>
                         <Form.Field required>
                             <label>Confirmar Contraseña {this.state.password && this.state.cPassword && this.state.cPassword !== this.state.password && " (No coinciden)"}</label>
@@ -1369,7 +1383,8 @@ export default class ModalParroquia extends Component {
                                 type='password' 
                                 placeholder='Escriba de nuevo la contraseña'
                                 onChange={e => this.setState({ cPassword: e.target.value }, () => this.checkDataParroquia())}
-                                value={this.state.cPassword}/>
+                                value={this.state.cPassword}
+                                onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                         </Form.Field>
                     </Form.Group>
                     <Button.Group>
@@ -1680,7 +1695,7 @@ export default class ModalParroquia extends Component {
             </Modal.Content>
         </Modal>
 
-        <Modal size={size} open={openEditar} onClose={this.close}>
+        <Modal size={size} open={openEditar} onClose={this.close} closeOnEscape={false} closeOnDimmerClick={false}>
             <Modal.Header>Editar Parroquia</Modal.Header>
             
             {this.state.step > 1 && <Step.Group>
@@ -1715,7 +1730,8 @@ export default class ModalParroquia extends Component {
                         <input
                             placeholder='Nit de la Parroquia' 
                             onChange={e => this.setState({ nit: e.target.value }, () => this.checkDataAuth())}
-                            value={this.state.nit}/>
+                            value={this.state.nit}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Field required>
                         <label>Contraseña</label>
@@ -1723,7 +1739,8 @@ export default class ModalParroquia extends Component {
                             type='password'
                             placeholder='Contraseña' 
                             onChange={e => this.setState({ password: e.target.value }, () => this.checkDataAuth())}
-                            value={this.state.password}/>
+                            value={this.state.password}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Button.Group>
                         <Button
@@ -1822,7 +1839,8 @@ export default class ModalParroquia extends Component {
                         <input
                             placeholder='NIT (sin puntos ni espacios)' 
                             onChange={e => this.setState({ nit: e.target.value }, () => this.checkDataPwRecover())}
-                            value={this.state.nit}/>
+                            value={this.state.nit}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
 
                     {this.state.pwdSent && <Message
@@ -1905,56 +1923,64 @@ export default class ModalParroquia extends Component {
                         <input
                             placeholder='Diocesis a la que pertenece' 
                             onChange={e => this.setState({ diocesis: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.diocesis}/>
+                            value={this.state.diocesis}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Field required>
                         <label>Ubicación: Ciudad / Municipio</label>
                         <input
                             placeholder='Ciudad / Municipio donde se encuentra' 
                             onChange={e => this.setState({ ubicacion: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.ubicacion}/>
+                            value={this.state.ubicacion}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>  
                     <Form.Field required>
                         <label>Nombre de la Parroquia</label>
                         <input
                             placeholder='Nombre Parroquia' 
                             onChange={e => this.setState({ nombre: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.nombre}/>
+                            value={this.state.nombre}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Field required>
                         <label>Nombre del Parroco</label>
                         <input
                             placeholder='Nombre Parroco' 
                             onChange={e => this.setState({ parroco: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.parroco}/>
+                            value={this.state.parroco}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Field required>
                         <label>Número de Teléfono de la Parroquia</label>
                         <input
                             placeholder='Número de Teléfono (sin puntos, guiones o espacios)' 
                             onChange={e => this.setState({ telefono: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.telefono}/>
+                            value={this.state.telefono}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Field required>
                         <label>Email</label>
                         <input
                             placeholder='Correo Electrónico' 
                             onChange={e => this.setState({ email: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.email}/>
+                            value={this.state.email}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>  
                     <Form.Field required>
                         <label>Dirección de la Parroquia</label>
                         <input 
                             placeholder='Dirección Parroquia' 
                             onChange={e => this.setState({ direccion: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.direccion}/>
+                            value={this.state.direccion}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Field required>
                         <label>Capacidad de la Parroquia - Considere restricciones de aforo COVID</label>
                         <input 
                             placeholder='Capacidad Parroquia (Número de personas - Considerando restricciones de aforo COVID)' 
                             onChange={e => this.setState({ capacidad: e.target.value }, () => this.checkDataParroquia())}
-                            value={this.state.capacidad}/>
+                            value={this.state.capacidad}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Group widths='equal'>
                         <Form.Field required>
@@ -1962,7 +1988,8 @@ export default class ModalParroquia extends Component {
                             <input 
                                 placeholder='Nit Parroquia (sin puntos, guiones o espacios)'
                                 disabled={true}
-                                value={this.state.nit}/>
+                                value={this.state.nit}
+                                onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                         </Form.Field>
                         <Form.Field>
                             <label id='auto-eval-covid'>¿Habilitar autoevaluación COVID?</label>
@@ -1980,7 +2007,8 @@ export default class ModalParroquia extends Component {
                                 type='password' 
                                 placeholder='Escoja una contraseña'
                                 onChange={e => this.setState({ password: e.target.value }, () => this.checkDataParroquia())}
-                                value={this.state.password}/>
+                                value={this.state.password}
+                                onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                         </Form.Field>
                         <Form.Field required>
                             <label>Confirmar Contraseña {this.state.password && this.state.cPassword && this.state.cPassword !== this.state.password && " (No coinciden)"}</label>
@@ -1988,7 +2016,8 @@ export default class ModalParroquia extends Component {
                                 type='password' 
                                 placeholder='Escriba de nuevo la contraseña'
                                 onChange={e => this.setState({ cPassword: e.target.value }, () => this.checkDataParroquia())}
-                                value={this.state.cPassword}/>
+                                value={this.state.cPassword}
+                                onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                         </Form.Field>
                     </Form.Group>
                     <Button.Group>
@@ -2280,7 +2309,7 @@ export default class ModalParroquia extends Component {
             </Modal.Content>
         </Modal>
 
-        <Modal size={size} open={openDownloadList} onClose={this.close} closeIcon>
+        <Modal size={size} open={openDownloadList} onClose={this.close} closeIcon closeOnEscape={false} closeOnDimmerClick={false}>
             <Modal.Header>Asistencia</Modal.Header>          
 
             <Modal.Content>
@@ -2296,7 +2325,8 @@ export default class ModalParroquia extends Component {
                         <input
                             placeholder='Nit de la Parroquia' 
                             onChange={e => this.setState({ nit: e.target.value }, () => this.checkDataAuth())}
-                            value={this.state.nit}/>
+                            value={this.state.nit}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Field required>
                         <label>Contraseña</label>
@@ -2304,7 +2334,8 @@ export default class ModalParroquia extends Component {
                             type='password'
                             placeholder='Contraseña' 
                             onChange={e => this.setState({ password: e.target.value }, () => this.checkDataAuth())}
-                            value={this.state.password}/>
+                            value={this.state.password}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Button.Group>
                         <Button
@@ -2407,7 +2438,8 @@ export default class ModalParroquia extends Component {
                         <input
                             placeholder='Código colaborador' 
                             onChange={e => this.setState({ codigoColaborador: e.target.value })}
-                            value={this.state.codigoColaborador}/>
+                            value={this.state.codigoColaborador}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>}
 
                     {this.state.soyColaborador && this.state.codigoColaborador && <Form.Field>
@@ -2479,7 +2511,8 @@ export default class ModalParroquia extends Component {
                         <input
                             placeholder='NIT (sin puntos ni espacios)' 
                             onChange={e => this.setState({ nit: e.target.value }, () => this.checkDataPwRecover())}
-                            value={this.state.nit}/>
+                            value={this.state.nit}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
 
                     {this.state.pwdSent && <Message

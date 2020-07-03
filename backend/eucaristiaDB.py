@@ -200,14 +200,38 @@ def crearInscripcion(data):
             asistentes.append(usuario)
             parroquia = parroquias.find_one( { "nit": i.split(":")[-1] } )
             semana = semanas.find_one( { "value": i.split(":")[2] } )
+
+            anio = int(semana.get("initYear"))
+            mes = int(semana.get("initMonth") - 1)
+            dia = int(semana.get("initDay") + next((x.get('value') for x in dias if x.get('key') == i.split(":")[1]), None))
+
+            full_date = 0
+            
+            try:
+              full_date = datetime(anio, mes, dia)
+
+            except:
+              dias_restados = 1  
+              while full_date == 0:
+                
+                try:
+                  full_date = datetime(anio, mes + 1, dia - dias_restados)
+                  try:
+                    full_date = datetime(anio, mes + 2, dias_restados)
+                  except:
+                    full_date = datetime(anio + 1, 1, dias_restados)
+                
+                except:
+                  full_date = 0
+                  dias_restados += 1
             
             obj = {
                 "id": i,
                 "asistentes": asistentes,
                 "hora": next((x.get('text') for x in horarios if x.get('key') == i.split(":")[0]), None),
-                "dia": semana.get("initDay") + next((x.get('value') for x in dias if x.get('key') == i.split(":")[1]), None),
-                "mes": semana.get("initMonth") - 1,
-                "year": semana.get("initYear"),
+                "dia": full_date.day,
+                "mes": full_date.month - 1,
+                "year": full_date.year,
                 "cupos": int(parroquia.get("capacidad")) - 1,
                 "available": True
             }
@@ -420,27 +444,9 @@ def disable_eucaristias():
     full_date = 0
     dia = int(i.get("dia"))
     
-    try:
-      full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 1, dia, hour, minute).timestamp()) + 3600 * 6
-
-    except:
-      dias_restados = 1  
-      while full_date == 0:
-        
-        try:
-          full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 1, dia - dias_restados, hour, minute).timestamp())
-          try:
-            full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 2, dias_restados, hour, minute).timestamp()) + 3600 * 6
-          except:
-            full_date = int(datetime(int(i.get("year")) + 1, 1, dias_restados, hour, minute).timestamp()) + 3600 * 6
-        
-        except:
-          full_date = 0
-          dias_restados += 1
+    full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 1, dia, hour, minute).timestamp()) + 3600 * 6
 
     if full_date < current_time:
-      print(full_date)
-      print(current_time)
       to_update.append(i.get("id"))
   
   

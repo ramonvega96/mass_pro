@@ -281,7 +281,7 @@ export default class ModalMisReservas extends Component {
     return (
       <div>
         <Button id="mis-reservas-button" positive onClick={this.openModal}>Ver mis reservas</Button>
-        <Modal size={size} open={open} onClose={this.close}>
+        <Modal size={size} open={open} onClose={this.close} closeOnEscape={false} closeOnDimmerClick={false}>
           {this.state.step < 3 && this.state.step > 0 && <Modal.Header>Mis Reservas</Modal.Header>}
           {this.state.step === 3 && <Modal.Header>Autoevaluación COVID-19</Modal.Header>}
           {this.state.step === 0 && <Modal.Header>Recuperar Contraseña</Modal.Header>}
@@ -301,7 +301,8 @@ export default class ModalMisReservas extends Component {
                         <input
                             placeholder='Identificación (sin puntos ni espacios)' 
                             onChange={e => this.setState({ id: e.target.value }, () => this.checkDataAuth())}
-                            value={this.state.id}/>
+                            value={this.state.id}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
                     <Form.Field required>
                         <label>Contraseña</label>
@@ -309,7 +310,8 @@ export default class ModalMisReservas extends Component {
                             type='password'
                             placeholder='Contraseña' 
                             onChange={e => this.setState({ password: e.target.value }, () => this.checkDataAuth())}
-                            value={this.state.password}/>
+                            value={this.state.password}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
 
                     {this.state.newUser && <Form.Field required>
@@ -318,42 +320,48 @@ export default class ModalMisReservas extends Component {
                               type='password'
                               placeholder='Confirmar Contraseña' 
                               onChange={e => this.setState({ cPassword: e.target.value }, () => this.checkDataAuth())}
-                              value={this.state.cPassword}/>
+                              value={this.state.cPassword}
+                              onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                       </Form.Field>}
                       {this.state.newUser && <Form.Field required>
                           <label>Nombres y Apellidos</label>
                           <input
                               placeholder='Nombres y Apellidos' 
                               onChange={e => this.setState({ nombre: e.target.value }, () => this.checkDataAuth())}
-                              value={this.state.nombre}/>
+                              value={this.state.nombre}
+                              onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                       </Form.Field>}
                       {this.state.newUser && <Form.Field required>
                           <label>Teléfono</label>
                           <input
                               placeholder='Teléfono' 
                               onChange={e => this.setState({ telefono: e.target.value }, () => this.checkDataAuth())}
-                              value={this.state.telefono}/>
+                              value={this.state.telefono}
+                              onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                       </Form.Field>}
                       {this.state.newUser && <Form.Field required>
                           <label>Email</label>
                           <input
                               placeholder='Correo electrónico' 
                               onChange={e => this.setState({ email: e.target.value }, () => this.checkDataAuth())}
-                              value={this.state.email}/>
+                              value={this.state.email}
+                              onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                       </Form.Field>}
                       {this.state.newUser && <Form.Field required>
                           <label>Dirección</label>
                           <input
                               placeholder='Dirección' 
                               onChange={e => this.setState({ direccion: e.target.value }, () => this.checkDataAuth())}
-                              value={this.state.direccion}/>
+                              value={this.state.direccion}
+                              onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                       </Form.Field>}
                       {this.state.newUser && <Form.Field required>
                           <label>Ubicación</label>
                           <input
                               placeholder='Ciudad / Municipio' 
                               onChange={e => this.setState({ ubicacion: e.target.value }, () => this.checkDataAuth())}
-                              value={this.state.ubicacion}/>
+                              value={this.state.ubicacion}
+                              onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                       </Form.Field>}
 
                     <Button.Group>
@@ -464,7 +472,8 @@ export default class ModalMisReservas extends Component {
                         <input
                             placeholder='Identificación (sin puntos ni espacios)' 
                             onChange={e => this.setState({ id: e.target.value }, () => this.checkDataPwRecover())}
-                            value={this.state.id}/>
+                            value={this.state.id}
+                            onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                     </Form.Field>
 
                     {this.state.pwdSent && <Message
