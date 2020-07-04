@@ -125,11 +125,13 @@ export default class ModalInscripcion extends Component {
               data.horario.sabPm.sort( comparar ); 
               data.horario.domPm.sort( comparar );   
               
-              this.setState({ horario: data.horario, horarioDisponible: true });
-
               fetch("/api/getSemanas").then(response =>
-                response.json().then(data => {
-                  this.setState({ semanas: data.semanas });
+                response.json().then(dataSemanas => {
+                  this.setState({ 
+                    semanas: dataSemanas.semanas, 
+                    horario: data.horario, 
+                    horarioDisponible: true 
+                  });
                 })
               );
           }
@@ -376,6 +378,7 @@ export default class ModalInscripcion extends Component {
     const horarioDisponible = (h) => {
       let theMinutes = h.split(":")[0].endsWith("30") ? 30 : 0;
       let theHour = Math.floor(parseInt(h.split(":")[0])/100);
+      
       let theDay = this.state.semanas.find(obj => {return obj.value === this.state.selectedWeek}).initDay + dias.find(obj => {return obj.value === h.split(":")[1]}).key;
       let theMonth = this.state.semanas.find(obj => {return obj.value === this.state.selectedWeek}).initMonth - 1;
       let theYear = this.state.semanas.find(obj => {return obj.value === this.state.selectedWeek}).initYear;
