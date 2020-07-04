@@ -231,9 +231,9 @@ def crearInscripcion(data):
                 "id": i,
                 "asistentes": asistentes,
                 "hora": next((x.get('text') for x in horarios if x.get('key') == i.split(":")[0]), None),
-                "dia": semana.get("initDay") + next((x.get('value') for x in dias if x.get('key') == i.split(":")[1]), None),
-                "mes": semana.get("initMonth") - 1,
-                "year": semana.get("initYear"),
+                "dia": full_date.day,
+                "mes": full_date.month - 1,
+                "year": full_date.year,
                 "cupos": int(parroquia.get("capacidad")) - 1,
                 "available": True
             }
@@ -539,15 +539,19 @@ def getEucaristiaColaborador(data):
 
 def disable_eucaristias():
   print("[" + datetime.today().strftime('%Y-%m-%d-%H:%M:%S') + "]: Health check disable_eucaristias.")
-  current_time = time.time()
+  current_time = int(time.time())
   eucaristias = eucaristias_db.find( { "available": True } )
   to_update = []
 
   for i in eucaristias:
     hour = math.floor(int(i.get("id").split(":")[0])/100)
     minute = 30 if i.get("id").split(":")[0].endswith("30") else 0
-    full_date = datetime(i.get("year"), i.get("mes") + 1, i.get("dia"), hour, minute).timestamp() + 3600
+
+    full_date = 0
+    dia = int(i.get("dia"))
     
+    full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 1, dia, hour, minute).timestamp()) + 3600 * 6
+
     if full_date < current_time:
       to_update.append(i.get("id"))
   
@@ -561,4 +565,5 @@ def disable_eucaristias():
             }
         }, multi=True
     )
+
     print("[" + datetime.today().strftime('%Y-%m-%d-%H:%M:%S') + "]: Old eucaristias marked as unavailable.")
