@@ -80,6 +80,24 @@ def crearInscripcion():
     NBData = request.get_json()
     return eucaristiaDB.crearInscripcion(NBData)
 
+@app.route('/api/createEucaristiaParticular', methods = ['POST'])
+def createEucaristiaParticular():
+    # Crear inscripcion en una misa de una parroquia
+    NBData = request.get_json()
+    return eucaristiaDB.createEucaristiaParticular(NBData)
+
+@app.route('/api/buscarEucaristiaParticular', methods = ['POST'])
+def buscarEucaristiaParticular():
+    # Crear inscripcion en una misa de una parroquia
+    NBData = request.get_json()
+    return eucaristiaDB.buscarEucaristiaParticular(NBData)
+
+@app.route('/api/getEucaristiaParticular', methods = ['POST'])
+def getEucaristiaParticular():
+    # Crear inscripcion en una misa de una parroquia
+    NBData = request.get_json()
+    return eucaristiaDB.getEucaristiaParticular(NBData)
+
 @app.route('/api/getEucaristias', methods = ['POST'])
 def getEucaristias():
     # Get eucaristias de una parroquia
