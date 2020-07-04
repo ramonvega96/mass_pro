@@ -1188,7 +1188,7 @@ export default class ModalInscripcion extends Component {
                               partiCode: "", 
                               parti: "",
                               errorEucaristiaParticular: ""})}>
-                            <Icon name='qrcode' /> Tengo un código
+                            <Icon name='qrcode' /> Tengo un Código - Eucaristia Particular
                           </List.Item>
                       </List>
                     </Modal.Actions>
