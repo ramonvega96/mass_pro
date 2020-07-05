@@ -6,6 +6,7 @@ import random
 import math
 import os
 import semanaDB
+import pytz
 
 # establecer conexion
 conn = MongoClient(
@@ -277,10 +278,7 @@ def createEucaristiaParticular(data):
   hour = math.floor(int(data.get("hora"))/100)
   minute = 30 if data.get("hora").endswith("30") else 0
   
-  py_date = datetime(data.get("year"), data.get("mes") + 1, data.get("dia"), hour, minute)
-
-  if py_date.timestamp() < time.time():
-    return {"error": "No se puede crear una Eucaristia en el pasado."}
+  py_date = datetime(data.get("year"), data.get("mes") + 1, data.get("dia"), hour, minute)  
   
   horario = horarios_db.find_one({ "nit": data.get("nit") })
 
@@ -547,14 +545,11 @@ def disable_eucaristias():
     hour = math.floor(int(i.get("id").split(":")[0])/100)
     minute = 30 if i.get("id").split(":")[0].endswith("30") else 0
 
-    full_date = 0
-    dia = int(i.get("dia"))
-    
-    full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 1, dia, hour, minute).timestamp()) + 3600 * 6
+    tz = pytz.timezone("Etc/GMT+5")
+    full_date = tz.localize(datetime(int(i.get("year")), int(i.get("mes")) + 1, int(i.get("dia")), hour, minute), is_dst=None).timestamp() + 900
 
     if full_date < current_time:
       to_update.append(i.get("id"))
-  
   
   if len(to_update) > 0:
     eucaristias_db.update(

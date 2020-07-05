@@ -140,6 +140,12 @@ def autenticarParroquia(data):
         }
         return resp
 
+    if parroquia.get("available") != True:
+        resp = {
+            "error": "La parroquia aún no ha sido verificada. Recibirás un correo una vez termine este proceso."
+        }
+        return resp
+
     horario = horarios.find_one( { "nit": nit } )
     
     del parroquia["_id"]

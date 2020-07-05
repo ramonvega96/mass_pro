@@ -1369,34 +1369,46 @@ export default class ModalParroquia extends Component {
                         "motivo": this.state.motivo
                     };
 
-                    let errorMsg = "";
+                    const selectedFecha = new Date(dataParticular.year, 
+                        dataParticular.mes, 
+                        dataParticular.dia, 
+                        Math.floor(dataParticular.hora/100),
+                        dataParticular.hora - Math.floor(dataParticular.hora/100)*100);
 
-                    fetch("/api/createEucaristiaParticular", {
-                        method: "POST",
-                        headers: {
-                        "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(dataParticular)
-                    }).then(resp =>
-                        resp.json().then(data => {
-                            if(!resp.ok){
-                                errorMsg = "Error interno. Por favor vuelva a intentar.";
-                                this.setState({ errorEucaristiaParticular: errorMsg });
-                            }
-                            else if (data.error){
-                                errorMsg = data.error;
-                                this.setState({ errorEucaristiaParticular: errorMsg });
-                            }
-                            else{
-                                this.setState({ 
-                                    errorEucaristiaParticular: "",
-                                    hParticular: "",
-                                    motivo: "",
-                                    parti: data
-                                });
-                            }
-                        })
-                    );
+                    if (selectedFecha > new Date()){
+                        let errorMsg = "";
+                        
+                        fetch("/api/createEucaristiaParticular", {
+                            method: "POST",
+                            headers: {
+                            "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(dataParticular)
+                        }).then(resp =>
+                            resp.json().then(data => {
+                                if(!resp.ok){
+                                    errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                    this.setState({ errorEucaristiaParticular: errorMsg });
+                                }
+                                else if (data.error){
+                                    errorMsg = data.error;
+                                    this.setState({ errorEucaristiaParticular: errorMsg });
+                                }
+                                else{
+                                    this.setState({ 
+                                        errorEucaristiaParticular: "",
+                                        hParticular: "",
+                                        motivo: "",
+                                        parti: data
+                                    });
+                                }
+                            })
+                        );
+                    }
+
+                    else{
+                        this.setState({ errorEucaristiaParticular: "No se puede crear una Eucaristia en el pasado." });
+                    }
                 }}
             />}
             
