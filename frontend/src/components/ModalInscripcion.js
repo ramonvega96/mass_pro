@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Modal, Form, Message, List, Checkbox, Card, Divider } from 'semantic-ui-react'
+import { Button, Modal, Form, Message, List, Checkbox, Card, Divider, Icon } from 'semantic-ui-react'
 
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
@@ -38,7 +38,10 @@ export default class ModalInscripcion extends Component {
         errorGetEucaristias: "",
         semanas: [],
         forgotPw: false,
-        pwRecovered: false
+        pwRecovered: false,
+        partiCode: "", 
+        parti: "",
+        errorEucaristiaParticular: ""
     });
   }
 
@@ -122,11 +125,13 @@ export default class ModalInscripcion extends Component {
               data.horario.sabPm.sort( comparar ); 
               data.horario.domPm.sort( comparar );   
               
-              this.setState({ horario: data.horario, horarioDisponible: true });
-
               fetch("/api/getSemanas").then(response =>
-                response.json().then(data => {
-                  this.setState({ semanas: data.semanas });
+                response.json().then(dataSemanas => {
+                  this.setState({ 
+                    semanas: dataSemanas.semanas, 
+                    horario: data.horario, 
+                    horarioDisponible: true 
+                  });
                 })
               );
           }
@@ -373,6 +378,7 @@ export default class ModalInscripcion extends Component {
     const horarioDisponible = (h) => {
       let theMinutes = h.split(":")[0].endsWith("30") ? 30 : 0;
       let theHour = Math.floor(parseInt(h.split(":")[0])/100);
+      
       let theDay = this.state.semanas.find(obj => {return obj.value === this.state.selectedWeek}).initDay + dias.find(obj => {return obj.value === h.split(":")[1]}).key;
       let theMonth = this.state.semanas.find(obj => {return obj.value === this.state.selectedWeek}).initMonth - 1;
       let theYear = this.state.semanas.find(obj => {return obj.value === this.state.selectedWeek}).initYear;
@@ -710,6 +716,7 @@ export default class ModalInscripcion extends Component {
                               value={this.state.selectedDate}
                               onChange={handleDateChange}
                               KeyboardButtonProps={{'aria-label': 'change date'}}
+                              minDate={new Date()}
                               />
                       </MuiPickersUtilsProvider>
                     </div>
@@ -1173,7 +1180,140 @@ export default class ModalInscripcion extends Component {
                         }}
                         />
                     </Button.Group>
+                    <Modal.Actions>
+                      <List horizontal>
+                          <List.Item id="tengo-un-codigo" href='#'onClick={() => this.setState({
+                              step: 3, 
+                              size: "mini", 
+                              partiCode: "", 
+                              parti: "",
+                              errorEucaristiaParticular: ""})}>
+                            <Icon name='qrcode' /> Tengo un Código - Eucaristia Particular
+                          </List.Item>
+                      </List>
+                    </Modal.Actions>
                 </Form>}
+                
+                {this.state.step === 3 && <Form>
+                  <Form.Group widths='equal'>
+                    <input
+                      id="search-parti-eucaristia"
+                      placeholder='Código de la Eucaristia'
+                      onChange={e => this.setState({ partiCode: e.target.value })}
+                      value={this.state.partiCode}
+                      onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}
+                    />
+                    <Button 
+                      circular
+                      icon='search'
+                      color='teal'
+                      disabled={!this.state.partiCode}
+                      onClick={() => {
+                          
+                          const dataParticular = {
+                              "partiCode": this.state.partiCode
+                          };
+      
+                          let errorMsg = "";
+      
+                          fetch("/api/getEucaristiaParticular", {
+                              method: "POST",
+                              headers: {
+                              "Content-Type": "application/json"
+                              },
+                              body: JSON.stringify(dataParticular)
+                          }).then(resp =>
+                              resp.json().then(data => {
+                                  if(!resp.ok){
+                                      errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                      this.setState({ errorEucaristiaParticular: errorMsg });
+                                  }
+                                  else if (data.error){
+                                      errorMsg = data.error;
+                                      this.setState({ errorEucaristiaParticular: errorMsg, parti: "" });
+                                  }
+                                  else{
+                                      this.setState({ 
+                                          errorEucaristiaParticular: "",
+                                          parti: data
+                                      });
+                                  }
+                              })
+                          );
+                        }}
+                      />
+                  </Form.Group>
+
+                  {this.state.errorEucaristiaParticular && <Message
+                        error
+                        header='Error en la inscripción'
+                        content={this.state.errorEucaristiaParticular}
+                        visible
+                  />}
+
+                  {this.state.parti && <Card fluid>
+                    <Card.Content header={this.state.parti.hora + " - " + this.state.parti.dia + "/" + parseInt(this.state.parti.mes + 1) + "/" + this.state.parti.year } />
+                    <Card.Content description={"Motivo: " + this.state.parti.motivo} />
+                    <Card.Content extra>
+                        <Icon name='ticket' /> {"Cupos: " + this.state.parti.cupos}
+                    </Card.Content>
+                    <Card.Content extra>
+                        <Icon name='qrcode' /> {"Código: " + this.state.parti.partiCode}
+                    </Card.Content>
+                    <Card.Content extra>
+                        <Button 
+                          fluid
+                          basic 
+                          color='green' 
+                          onClick={() => {
+                          
+                            const inscripcionData = {
+                              eucaristias: [this.state.parti.id],
+                              user: this.state.usuario
+                            };
+  
+                            let errorMsg = "";
+                            let day = "";
+                            let hora = "";
+  
+                            fetch("/api/crearInscripcion", {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json"
+                              },
+                              body: JSON.stringify(inscripcionData)
+                            }).then(res =>
+                              res.json().then(data => {
+                                  if(!res.ok){
+                                      errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                      this.setState({ errorEucaristiaParticular: errorMsg });
+                                  }
+                                  else if (data.error){
+                                      day = dias.find(obj => {return obj.value === data.horario.split(":")[1]}).text;
+                                      hora = horariosAm.concat(horariosPm).find(obj => {return obj.value === data.horario.split(":")[0]}).text;
+                                      errorMsg = data.error + ": " + day + " - " + hora;
+                                      this.setState({ errorEucaristiaParticular: errorMsg });
+                                  }
+                                  else{
+                                    this.close();
+                                  }
+                              })
+                            );
+                          }}>
+                              ¡Guardar Cupo!
+                        </Button>
+                    </Card.Content>
+                  </Card>}
+                
+                  <Modal.Actions>
+                    <List horizontal>
+                        <List.Item id="tengo-un-codigo" href='#'onClick={() => this.setState({step: 2, size: "small"})}>
+                          <Icon name='qrcode' /> NO tengo un código
+                        </List.Item>
+                    </List>
+                  </Modal.Actions>
+                </Form>}
+
           </Modal.Content>
         </Modal>
       </div>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Modal, Form, Icon, Step, List, Message, Checkbox, Tab, Table, Divider } from 'semantic-ui-react'
+import { Button, Modal, Form, Icon, Step, List, Message, Checkbox, Tab, Table, Divider, TextArea, Card } from 'semantic-ui-react'
 import jsPDF from 'jspdf';
 import "jspdf-autotable";
 
@@ -36,6 +36,11 @@ export default class ModalParroquia extends Component {
             hSabPm: [],
             hDomAm: [],
             hDomPm: [],
+            
+            hParticular: "",
+            motivo: "",
+            searchCreate: "Crear",
+            parti: "",           
 
             selectedDate: new Date(),
             eucaristias: [],
@@ -327,6 +332,11 @@ export default class ModalParroquia extends Component {
         hSabPm: [],
         hDomAm: [],
         hDomPm: [],
+        
+        hParticular: "",
+        motivo: "",
+        searchCreate: "Crear",
+        parti: "",
 
         codigoColaborador: "",
         forgotPw: false,
@@ -365,17 +375,23 @@ export default class ModalParroquia extends Component {
         else{
           this.setState({ authStepCompleted: false });
         }
-      }
+    }
 
-      checkDataPwRecover() {
+    checkDataPwRecover() {
         if(this.state.nit &&
-          !isNaN(this.state.nit)){
+            !isNaN(this.state.nit)){
             this.setState({ authStepCompleted: true, errorAuth: "" });
         }
         else{
             this.setState({ authStepCompleted: false, errorAuth: "" });
         }
-      }
+    }
+
+    handleChangeSearchCreate = (e, { value }) => this.setState({ 
+        searchCreate: value, 
+        errorEucaristiaParticular: "",
+        parti: "" 
+    })
 
   render() {
     const { openInscribir, openEditar, openDownloadList, size } = this.state
@@ -423,6 +439,9 @@ export default class ModalParroquia extends Component {
                 break;
             case 'hDomPm':
                 this.setState({ hDomPm: value });
+                break;
+            case 'hParticular':
+                this.setState({ hParticular: value, errorEucaristiaParticular: "", parti: "" });
                 break;
             default:
                 break
@@ -682,6 +701,10 @@ export default class ModalParroquia extends Component {
           );
       };
 
+      const handleDateParticularChange = (date) => {
+          this.setState({selectedParticularDate: date, hParticular: "", parti: ""});
+      };
+
       const handleChangeEucaristia = (e, {value}) => {
         this.setState({
             selectedEucaristia: this.state.eucaristias.find(obj => {return obj.value === value}),
@@ -841,6 +864,7 @@ export default class ModalParroquia extends Component {
                     value={this.state.selectedDate}
                     onChange={handleDateChange}
                     KeyboardButtonProps={{'aria-label': 'change date'}}
+                    minDate={new Date()}
                     />
             </MuiPickersUtilsProvider>
         </Form.Field>
@@ -1213,28 +1237,221 @@ export default class ModalParroquia extends Component {
                 }}
             />}
 
-    </Form>  
+    </Form> 
+    
+    const crearParticular = <Form>
+            <Form.Field required>
+                <label>Fecha</label>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <KeyboardDatePicker
+                    id="date-picker-dialog-crear-particular"                        
+                    format="dd/MM/yyyy"
+                    value={this.state.selectedParticularDate}
+                    onChange={handleDateParticularChange}
+                    KeyboardButtonProps={{'aria-label': 'change date'}}
+                    minDate={new Date()}
+                    />
+                </MuiPickersUtilsProvider>
+            </Form.Field>
+            <Form.Field required>
+                <label>Hora</label>
+                <Form.Select
+                    id="hParticular"
+                    fluid
+                    options={horariosAm.concat(horariosPm)}
+                    placeholder='Hora'
+                    selection
+                    onChange={handleChange.bind(this)}
+                    value={this.state.hParticular}
+                    />
+            </Form.Field>
+            
+            <Form.Field>
+                Quiero: <b>{this.state.searchCreate} una Eucaristia</b>
+            </Form.Field>
+            <Form.Field>
+                <Checkbox
+                    radio
+                    label='Crear una Eucaristia'
+                    name='checkboxRadioGroup'
+                    value='Crear'
+                    checked={this.state.searchCreate === 'Crear'}
+                    onChange={this.handleChangeSearchCreate}
+                />
+            </Form.Field>
+            <Form.Field>
+                <Checkbox
+                    radio
+                    label='Buscar una Eucaristia'
+                    name='checkboxRadioGroup'
+                    value='Buscar'
+                    checked={this.state.searchCreate === 'Buscar'}
+                    onChange={this.handleChangeSearchCreate}
+                />
+            </Form.Field>
+            
+            {this.state.searchCreate === "Crear" && <Form.Field required>
+                <label>Motivo Eucaristia</label>
+                <TextArea 
+                    onChange={e => this.setState({ motivo: e.target.value })}
+                    value={this.state.motivo}/>
+            </Form.Field>}
+            
+            {this.state.errorEucaristiaParticular && <Message
+                error
+                header='¡Error!'
+                content={this.state.errorEucaristiaParticular}
+                visible
+            />}
+
+            {this.state.searchCreate === "Buscar" && <Button
+                color='teal'
+                icon='search'
+                labelPosition='left'
+                content='Buscar'
+                disabled={!this.state.hParticular}
+                onClick={() => {
+                    
+                    const dataParticular = {
+                        "hora": this.state.hParticular,
+                        "dia": this.state.selectedParticularDate.getDate(),
+                        "mes": this.state.selectedParticularDate.getMonth(),
+                        "year": this.state.selectedParticularDate.getFullYear(),
+                        "nit": this.state.nit
+                    };
+
+                    let errorMsg = "";
+                    
+                    fetch("/api/buscarEucaristiaParticular", {
+                        method: "POST",
+                        headers: {
+                        "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(dataParticular)
+                    }).then(resp =>
+                        resp.json().then(data => {
+                            if(!resp.ok){
+                                errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                this.setState({ errorEucaristiaParticular: errorMsg });
+                            }
+                            else if (data.error){
+                                errorMsg = data.error;
+                                this.setState({ 
+                                    errorEucaristiaParticular: errorMsg 
+                                });
+                            }
+                            else{
+                                this.setState({ 
+                                    errorEucaristiaParticular: "",
+                                    hParticular: "",
+                                    parti: data  
+                                });
+                            }
+                        })
+                    );
+                }}
+            />}
+            
+            {this.state.searchCreate === "Crear" && <Button            
+                color='green'
+                icon='magic'
+                labelPosition='right'
+                content='Crear'
+                disabled={!this.state.motivo || !this.state.hParticular}
+                onClick={() => {
+                    
+                    const dataParticular = {
+                        "hora": this.state.hParticular,
+                        "dia": this.state.selectedParticularDate.getDate(),
+                        "mes": this.state.selectedParticularDate.getMonth(),
+                        "year": this.state.selectedParticularDate.getFullYear(),
+                        "nit": this.state.nit,
+                        "motivo": this.state.motivo
+                    };
+
+                    const selectedFecha = new Date(dataParticular.year, 
+                        dataParticular.mes, 
+                        dataParticular.dia, 
+                        Math.floor(dataParticular.hora/100),
+                        dataParticular.hora - Math.floor(dataParticular.hora/100)*100);
+
+                    if (selectedFecha > new Date()){
+                        let errorMsg = "";
+                        
+                        fetch("/api/createEucaristiaParticular", {
+                            method: "POST",
+                            headers: {
+                            "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(dataParticular)
+                        }).then(resp =>
+                            resp.json().then(data => {
+                                if(!resp.ok){
+                                    errorMsg = "Error interno. Por favor vuelva a intentar.";
+                                    this.setState({ errorEucaristiaParticular: errorMsg });
+                                }
+                                else if (data.error){
+                                    errorMsg = data.error;
+                                    this.setState({ errorEucaristiaParticular: errorMsg });
+                                }
+                                else{
+                                    this.setState({ 
+                                        errorEucaristiaParticular: "",
+                                        hParticular: "",
+                                        motivo: "",
+                                        parti: data
+                                    });
+                                }
+                            })
+                        );
+                    }
+
+                    else{
+                        this.setState({ errorEucaristiaParticular: "No se puede crear una Eucaristia en el pasado." });
+                    }
+                }}
+            />}
+            
+            {this.state.parti && <Card fluid>
+                <Card.Content header={this.state.parti.hora + " - " + this.state.parti.dia + "/" + parseInt(this.state.parti.mes + 1) + "/" + this.state.parti.year } />
+                <Card.Content description={"Motivo: " + this.state.parti.motivo} />
+                <Card.Content extra>
+                    <Icon name='ticket' /> {"Cupos: " + this.state.parti.cupos}
+                </Card.Content>
+                <Card.Content extra>
+                    <Icon name='qrcode' /> {"Código: " + this.state.parti.partiCode + " - (Comparta este código)"}
+                </Card.Content>
+            </Card>}
+
+        </Form>
 
       const panesBio = [
         {
-          menuItem: 'Tomar asistencia',
+          menuItem: 'Asistencia',
           pane: { 
               key: 'tab1', 
               content: asistencia
             }
         },
         {
-          menuItem: 'Descargar reportes',
+          menuItem: 'Reportes',
           pane: {
             key: 'tab2',
             content: reportesNoBio
+          }
+        },
+        {
+          menuItem: 'Eucaristias Particulares',
+          pane: {
+            key: 'tab3',
+            content: crearParticular
           }
         }
       ];
 
       const panesBioColab = [
         {
-          menuItem: 'Tomar asistencia',
+          menuItem: 'Asistencia',
           pane: { 
               key: 'tab1', 
               content: asistenciaColab
@@ -1244,10 +1461,17 @@ export default class ModalParroquia extends Component {
 
       const panesNoBio = [
         {
-          menuItem: 'Descargar listas',
+          menuItem: 'Listas',
           pane: {
             key: 'tab1',
             content: reportesBio
+          }
+        },
+        {
+          menuItem: 'Eucaristias Particulares',
+          pane: {
+            key: 'tab2',
+            content: crearParticular
           }
         }
       ];
@@ -2379,6 +2603,7 @@ export default class ModalParroquia extends Component {
                                     }
                                     else{
                                         handleDateChange(this.state.selectedDate);
+                                        handleDateParticularChange(this.state.selectedDate);
                                         this.setState({
                                             authStepCompleted: true,
                                             step: 2,

@@ -5,6 +5,8 @@ import time
 import random
 import math
 import os
+import semanaDB
+import pytz
 
 # establecer conexion
 conn = MongoClient(
@@ -22,6 +24,7 @@ eucaristias_db = db.eucaristias
 parroquias = db.parroquias
 usuarios = db.usuarios
 semanas = db.semanas
+horarios_db = db.horarios
 
 horarios = [
       {
@@ -202,7 +205,7 @@ def crearInscripcion(data):
             semana = semanas.find_one( { "value": i.split(":")[2] } )
 
             anio = int(semana.get("initYear"))
-            mes = int(semana.get("initMonth") - 1)
+            mes = int(semana.get("initMonth"))
             dia = int(semana.get("initDay") + next((x.get('value') for x in dias if x.get('key') == i.split(":")[1]), None))
 
             full_date = 0
@@ -215,9 +218,9 @@ def crearInscripcion(data):
               while full_date == 0:
                 
                 try:
-                  full_date = datetime(anio, mes + 1, dia - dias_restados)
+                  full_date = datetime(anio, mes, dia - dias_restados)
                   try:
-                    full_date = datetime(anio, mes + 2, dias_restados)
+                    full_date = datetime(anio, mes + 1, dias_restados)
                   except:
                     full_date = datetime(anio + 1, 1, dias_restados)
                 
@@ -265,6 +268,97 @@ def crearInscripcion(data):
         )
         
     return data
+
+def createEucaristiaParticular(data):
+  week = semanaDB.getSemana({"year": data.get("year"), "month": data.get("mes"), "day": data.get("dia")})
+
+  if week.get("error"):
+    return {"error": "Únicamente se puede programar Eucaristias particulares para la semana en curso y la siguiente."}
+  
+  hour = math.floor(int(data.get("hora"))/100)
+  minute = 30 if data.get("hora").endswith("30") else 0
+  
+  py_date = datetime(data.get("year"), data.get("mes") + 1, data.get("dia"), hour, minute)  
+  
+  horario = horarios_db.find_one({ "nit": data.get("nit") })
+
+  day = py_date.weekday()
+  day = day + 1 if day < 6 else 0
+  day = next((x.get('key') for x in dias if x.get('value') == day), None)
+
+  horas = horario.get("horario").get(day + "Am") + horario.get("horario").get(day + "Pm")
+  
+  if(data.get("hora") in horas):
+    return {"error": "El horario seleccionado ya existe dentro de los horarios habituales de Eucaristia."}
+
+  eucaristiaId = data.get("hora") + ":" + day + ":" + week.get("value") + ":" + data.get("nit")
+  
+  eucaristia = eucaristias_db.find_one( { "id": eucaristiaId } )
+  
+  if eucaristia is not None:
+    return {"error": "En el horario seleccionado ya hay una Eucaristia programada."}
+
+  parroquia = parroquias.find_one( { "nit": data.get("nit") } )
+  partiCode = generarPartiCode(eucaristiaId)
+
+  if partiCode == 0:
+    return {"error": "Error creando la Eucaristia. Por favor, vuelva a intentarlo."}
+  
+  obj = {
+      "id": eucaristiaId,
+      "asistentes": [],
+      "hora": next((x.get('text') for x in horarios if x.get('key') == data.get("hora")), None),
+      "dia": py_date.day,
+      "mes": py_date.month - 1,
+      "year": py_date.year,
+      "cupos": int(parroquia.get("capacidad")),
+      "available": True,
+      "motivo": data.get("motivo"),
+      "partiCode": partiCode
+  }
+  
+  eucaristias_db.insert(obj)
+  del obj["_id"]
+  return obj
+
+def buscarEucaristiaParticular(data):
+  week = semanaDB.getSemana({"year": data.get("year"), "month": data.get("mes"), "day": data.get("dia")})
+
+  if week.get("error"):
+    return {"error": "Únicamente hay programadas Eucaristias particulares para la semana en curso y la siguiente."}
+
+  horario = horarios_db.find_one({ "nit": data.get("nit") })
+
+  
+  py_date = datetime(data.get("year"), data.get("mes") + 1, data.get("dia"))
+  day = py_date.weekday()
+  day = day + 1 if day < 6 else 0
+  day = next((x.get('key') for x in dias if x.get('value') == day), None)
+
+  horas = horario.get("horario").get(day + "Am") + horario.get("horario").get(day + "Pm")
+  
+  if(data.get("hora") in horas):
+    return {"error": "El horario seleccionado es un horario habitual y no uno particular."}
+
+  eucaristiaId = data.get("hora") + ":" + day + ":" + week.get("value") + ":" + data.get("nit")
+  
+  eucaristia = eucaristias_db.find_one( { "id": eucaristiaId } )
+  
+  if eucaristia is None:
+    return {"error": "No existe ninguna Eucaristia particular programada en este horario."}
+
+  del eucaristia["_id"]
+  return eucaristia
+
+def getEucaristiaParticular(data):
+  partiCode = int(data.get("partiCode"))  
+  eucaristia = eucaristias_db.find_one( { "partiCode": partiCode, "available": True } )
+  
+  if eucaristia is None:
+    return {"error": "No existe ninguna Eucaristia particular con este código."}
+
+  del eucaristia["_id"]
+  return eucaristia
 
 def getEucaristias(data):
     regexExp = data.get("id") + "$"
@@ -420,6 +514,16 @@ def generarColabCode(data):
   
   return {"colabCode": code}  
 
+def generarPartiCode(eucaristiaId):
+  code = random.randint(100000, 999999)
+
+  eucaristias = eucaristias_db.find( {"$and": [{ "partiCode": code }, { "available": True }]} )
+
+  if eucaristias.count() > 0:
+    return 0
+
+  return code   
+
 def getEucaristiaColaborador(data):
   code = data.get("colabCode")
   eucaristia = eucaristias_db.find_one( {"$and": [{ "colabCode": code }, { "available": True }]} )
@@ -441,14 +545,11 @@ def disable_eucaristias():
     hour = math.floor(int(i.get("id").split(":")[0])/100)
     minute = 30 if i.get("id").split(":")[0].endswith("30") else 0
 
-    full_date = 0
-    dia = int(i.get("dia"))
-    
-    full_date = int(datetime(int(i.get("year")), int(i.get("mes")) + 1, dia, hour, minute).timestamp()) + 3600 * 6
+    tz = pytz.timezone("Etc/GMT+5")
+    full_date = tz.localize(datetime(int(i.get("year")), int(i.get("mes")) + 1, int(i.get("dia")), hour, minute), is_dst=None).timestamp() + 900
 
     if full_date < current_time:
       to_update.append(i.get("id"))
-  
   
   if len(to_update) > 0:
     eucaristias_db.update(
