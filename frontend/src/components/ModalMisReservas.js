@@ -364,6 +364,56 @@ export default class ModalMisReservas extends Component {
                               onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
                       </Form.Field>}
 
+                      {this.state.newUser && <Form.Field>
+                        <Accordion>
+                          <Accordion.Title
+                            active={this.state.activeIndex === 0}
+                            index={0}
+                            onClick={this.handleAccordionClick}
+                          >
+                            <Icon name='dropdown' />
+                            Haga click aquí para leer nuestra política de tratamiento de datos y click en "Siguiente" 
+                            si está de acuerdo con la misma.
+                          </Accordion.Title>
+                          <Accordion.Content active={this.state.activeIndex === 0}>
+                            <p>
+                              Toda la información se recoge con fines de interés público ante 
+                              la situación decretada por las Autoridades Públicas, para proteger y salvaguardar 
+                              un interés esencial para la vida de las personas, en consecuencia, autorizo a esta 
+                              aplicación, para el manejo de la información aportada en este formulario de inscripción 
+                              con el propósito de desarrollar acciones de promoción y prevención frente al riesgo 
+                              de contagio acorde con lo normado por el Ministerio de Salud y las demás autoridades 
+                              competentes.
+                            </p>
+                            <p>
+                              De conformidad con lo establecido en la Ley 1581 de 2012 de protección de datos personales, 
+                              se podrá suministrar información a las entidades públicas o administrativas que en el ejercicio 
+                              de sus funciones legales así lo requieran, o a las personas establecidas en el artículo 13 de la ley.
+                            </p>
+                            <p>
+                              Los datos proporcionados por el usuario deben ser veraces, completos, exactos, actualizados, 
+                              comprobables y comprensibles y en consecuencia el usuario asume TODA la responsabilidad sobre 
+                              la falta de veracidad o exactitud de éstos.
+                            </p>
+                            <p>
+                              A los datos proporcionados por el usuario, podrán acceder únicamente los administradores de las 
+                              parroquias en las que se celebren las Eucaristías a las que este se inscriba. Los administradores
+                              de las parroquias se comprometen a usar esta información estrictamente para presentarla a las 
+                              autoridades pertinentes en caso de ser requerida. Si los administradores de las parroquias no hacen
+                              uso debido de los datos proporcionados por el usuario, el usuario puede reportar esto y en ese caso 
+                              la parroquia será removida de la plataforma. El usuario, al inscribirse en esta plataforma, asume TODA 
+                              responsabilidad sobre el uso que se le de a sus datos por parte de los administradores de las 
+                              parroquias a las que asiste y por parte de los administradores de esta plataforma.
+                            </p>
+                            <p>
+                              Los administradores de esta plataforma se limitan única y exclusivamente a garantizar el Habeas Data, 
+                              es decir el derecho que tiene los usuarios de conocer, actualizar, rectificar y eliminar la información que 
+                              se haya recogido sobre ellos en bases de datos.
+                            </p>
+                          </Accordion.Content>
+                        </Accordion>
+                      </Form.Field>}
+
                     <Button.Group>
                         <Button
                         negative
@@ -636,7 +686,7 @@ export default class ModalMisReservas extends Component {
                     </Accordion.Title>
                     <Accordion.Content active={this.state.activeIndex === 0}>
                       <p>
-                        Toda la información se recoge con fines estrictamente de interés público ante 
+                        Toda la información se recoge con fines de interés público ante 
                         la situación decretada por las Autoridades Públicas, para proteger y salvaguardar 
                         un interés esencial para la vida de las personas, en consecuencia, autorizo a esta 
                         aplicación, para el manejo de la información aportada en esta autoevaluación de 
