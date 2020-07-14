@@ -6,6 +6,7 @@ import ModalParroquia from './components/ModalParroquia';
 import Parroquias from './components/Parroquias';
 import ModalMisReservas from './components/ModalMisReservas';
 import AdminModule from './components/AdminModule';
+import SpeedDial from './components/SpeedDial';
 
 
 function App() {
@@ -70,7 +71,8 @@ function App() {
 
   return (
     <section className="App">
-      <Input fluid icon='search' placeholder='Busca tu parroquia por su nombre!' onChange={e => setFilteredValues(e.target.value)}/>
+      <Input id="buscar-parroquia" fluid icon='search' placeholder='Busca tu parroquia por su nombre!' onChange={e => setFilteredValues(e.target.value)}/>
+      <SpeedDial />
       <Router>
         <Route exact path="/" component={IndexPage} />
         <Route exact path="/adminModule" component={adminModulePage} />
