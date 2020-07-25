@@ -311,7 +311,7 @@ def createEucaristiaParticular(data):
       "dia": py_date.day,
       "mes": py_date.month - 1,
       "year": py_date.year,
-      "cupos": int(parroquia.get("capacidad")),
+      "cupos": data.get("capacidad"),
       "available": True,
       "motivo": data.get("motivo"),
       "partiCode": partiCode
