@@ -39,6 +39,7 @@ export default class ModalParroquia extends Component {
             
             hParticular: "",
             motivo: "",
+            cupos:"",
             searchCreate: "Crear",
             parti: "",           
 
@@ -335,6 +336,7 @@ export default class ModalParroquia extends Component {
         
         hParticular: "",
         motivo: "",
+        cupos:"",
         searchCreate: "Crear",
         parti: "",
 
@@ -392,6 +394,11 @@ export default class ModalParroquia extends Component {
         errorEucaristiaParticular: "",
         parti: "" 
     })
+
+    handleChangeCupos(evt) {
+        const cupos = (evt.target.validity.valid) ? evt.target.value : this.state.cupos;
+        this.setState({ cupos });
+      }
 
   render() {
     const { openInscribir, openEditar, openDownloadList, size } = this.state
@@ -1296,6 +1303,17 @@ export default class ModalParroquia extends Component {
                     onChange={e => this.setState({ motivo: e.target.value })}
                     value={this.state.motivo}/>
             </Form.Field>}
+
+            {this.state.searchCreate === "Crear" && <Form.Field required>
+                <label>Cupos</label>
+                <input
+                    type="text"
+                    pattern="[0-9]*" 
+                    placeholder='Cantidad asistentes'                     
+                    onInput={this.handleChangeCupos.bind(this)}
+                    value={this.state.cupos}
+                    onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}/>
+            </Form.Field>}
             
             {this.state.errorEucaristiaParticular && <Message
                 error
@@ -1357,7 +1375,7 @@ export default class ModalParroquia extends Component {
                 icon='magic'
                 labelPosition='right'
                 content='Crear'
-                disabled={!this.state.motivo || !this.state.hParticular}
+                disabled={!this.state.motivo || !this.state.hParticular || !this.state.cupos}
                 onClick={() => {
                     
                     const dataParticular = {
@@ -1366,7 +1384,8 @@ export default class ModalParroquia extends Component {
                         "mes": this.state.selectedParticularDate.getMonth(),
                         "year": this.state.selectedParticularDate.getFullYear(),
                         "nit": this.state.nit,
-                        "motivo": this.state.motivo
+                        "motivo": this.state.motivo,
+                        "capacidad": parseInt(this.state.cupos)
                     };
 
                     const selectedFecha = new Date(dataParticular.year, 
@@ -1399,6 +1418,7 @@ export default class ModalParroquia extends Component {
                                         errorEucaristiaParticular: "",
                                         hParticular: "",
                                         motivo: "",
+                                        cupos: "",
                                         parti: data
                                     });
                                 }

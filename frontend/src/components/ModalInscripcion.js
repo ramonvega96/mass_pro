@@ -1319,7 +1319,7 @@ export default class ModalInscripcion extends Component {
                         <Icon name='qrcode' /> {"Código: " + this.state.parti.partiCode}
                     </Card.Content>
                     <Card.Content extra>
-                        <Button 
+                        {this.state.parti.cupos > 0 && <Button 
                           fluid
                           basic 
                           color='green' 
@@ -1359,7 +1359,13 @@ export default class ModalInscripcion extends Component {
                             );
                           }}>
                               ¡Guardar Cupo!
-                        </Button>
+                        </Button>}
+                        {this.state.parti.cupos === 0 && <Message
+                            error
+                            header='Cupos'
+                            content="Ya no hay cupos disponibles en esta Eucaristia."
+                            visible
+                        />}
                     </Card.Content>
                   </Card>}
                 
