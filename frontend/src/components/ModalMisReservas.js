@@ -434,7 +434,7 @@ export default class ModalMisReservas extends Component {
                             var errorMsg = "";
 
                             const authData = {
-                                id: this.state.id,
+                                id: this.state.id.trim(),
                                 password: this.state.password,
                                 nombre: this.state.nombre,
                                 direccion: this.state.direccion,

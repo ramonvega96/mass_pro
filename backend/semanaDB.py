@@ -33,19 +33,24 @@ def getSemanas():
 
 # get semana with date
 def getSemana(data):
-    fecha = int(datetime(data.get("year"), data.get("month") + 1, data.get("day")).timestamp())
 
-    week = semanas.find_one( {"$and":[ 
-        { "initTs": { "$lte": fecha } }, 
-        { "endTs": { "$gt": fecha } },
-        {"$or":[ { "status": "current" }, { "status": "future" }]}
-    ]})
+    try:
+        fecha = int(datetime(data.get("year"), data.get("month") + 1, data.get("day")).timestamp())
 
-    if week is not None:
-        del week["_id"]
-        return week
-        
-    return {"error": "Semana no encontrada"}
+        week = semanas.find_one( {"$and":[ 
+            { "initTs": { "$lte": fecha } }, 
+            { "endTs": { "$gt": fecha } },
+            {"$or":[ { "status": "current" }, { "status": "future" }]}
+        ]})
+
+        if week is not None:
+            del week["_id"]
+            return week
+            
+        return {"error": "Semana no encontrada"}
+
+    except:
+        return {"error": "La fecha ingresada no es válida."}
 
 # add week
 def addSemana():

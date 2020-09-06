@@ -350,8 +350,15 @@ def buscarEucaristiaParticular(data):
   del eucaristia["_id"]
   return eucaristia
 
-def getEucaristiaParticular(data):
-  partiCode = int(data.get("partiCode"))  
+def getEucaristiaParticular(data): 
+  partiCode = 0
+  
+  try:
+    partiCode = int(data.get("partiCode"))
+  
+  except:
+    pass
+  
   eucaristia = eucaristias_db.find_one( { "partiCode": partiCode, "available": True } )
   
   if eucaristia is None:
