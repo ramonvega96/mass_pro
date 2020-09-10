@@ -839,6 +839,13 @@ export default class ModalInscripcion extends Component {
                       </Form.Group>
                     </Form.Field>}
 
+                    {this.state.horario.lunAm.length === 0 && this.state.horario.lunPm.length === 0 && this.state.selectedDay === "lun" && <Message
+                        warning
+                        header="No hay horarios programados."
+                        content="No se han programado aún horarios ni en la mañana ni en la tarde para los días Lunes. Para más información, comunicate con tu parroquia."
+                        visible
+                    />}
+
                     {this.state.horario.marAm.length > 0 && this.state.selectedDay === "mar" && <Form.Field>
                     <label>Horarios en la mañana</label>
                       <Form.Group widths='equal'>                    
@@ -889,7 +896,14 @@ export default class ModalInscripcion extends Component {
                       })}        
                       </Card.Group>
                       </Form.Group>
-                    </Form.Field>} 
+                    </Form.Field>}
+
+                    {this.state.horario.marAm.length === 0 && this.state.horario.marPm.length === 0 && this.state.selectedDay === "mar" && <Message
+                        warning
+                        header="No hay horarios programados."
+                        content="No se han programado aún horarios ni en la mañana ni en la tarde para los días Martes. Para más información, comunicate con tu parroquia."
+                        visible
+                    />} 
 
                     {this.state.horario.mieAm.length > 0 && this.state.selectedDay === "mie" && <Form.Field>
                     <label>Horarios en la mañana</label>
@@ -941,7 +955,14 @@ export default class ModalInscripcion extends Component {
                       })}        
                       </Card.Group>
                       </Form.Group>
-                    </Form.Field>} 
+                    </Form.Field>}
+                    
+                    {this.state.horario.mieAm.length === 0 && this.state.horario.miePm.length === 0 && this.state.selectedDay === "mie" && <Message
+                        warning
+                        header="No hay horarios programados."
+                        content="No se han programado aún horarios ni en la mañana ni en la tarde para los días Miércoles. Para más información, comunicate con tu parroquia."
+                        visible
+                    />} 
 
                     {this.state.horario.jueAm.length > 0 && this.state.selectedDay === "jue" && <Form.Field>
                     <label>Horarios en la mañana</label>
@@ -993,7 +1014,14 @@ export default class ModalInscripcion extends Component {
                       })}        
                       </Card.Group>
                       </Form.Group>
-                    </Form.Field>} 
+                    </Form.Field>}
+
+                    {this.state.horario.jueAm.length === 0 && this.state.horario.juePm.length === 0 && this.state.selectedDay === "jue" && <Message
+                        warning
+                        header="No hay horarios programados."
+                        content="No se han programado aún horarios ni en la mañana ni en la tarde para los días Jueves. Para más información, comunicate con tu parroquia."
+                        visible
+                    />}                      
 
                     {this.state.horario.vieAm.length > 0 && this.state.selectedDay === "vie" && <Form.Field>
                     <label>Horarios en la mañana</label>
@@ -1045,7 +1073,14 @@ export default class ModalInscripcion extends Component {
                       })}        
                       </Card.Group>
                       </Form.Group>
-                    </Form.Field>} 
+                    </Form.Field>}
+
+                    {this.state.horario.vieAm.length === 0 && this.state.horario.viePm.length === 0 && this.state.selectedDay === "vie" && <Message
+                        warning
+                        header="No hay horarios programados."
+                        content="No se han programado aún horarios ni en la mañana ni en la tarde para los días Viernes. Para más información, comunicate con tu parroquia."
+                        visible
+                    />}  
 
                     {this.state.horario.sabAm.length > 0 && this.state.selectedDay === "sab" && <Form.Field>
                     <label>Horarios en la mañana</label>
@@ -1097,7 +1132,14 @@ export default class ModalInscripcion extends Component {
                       })}        
                       </Card.Group>
                       </Form.Group>
-                    </Form.Field>} 
+                    </Form.Field>}
+
+                    {this.state.horario.sabAm.length === 0 && this.state.horario.sabPm.length === 0 && this.state.selectedDay === "sab" && <Message
+                        warning
+                        header="No hay horarios programados."
+                        content="No se han programado aún horarios ni en la mañana ni en la tarde para los días Sábado. Para más información, comunicate con tu parroquia."
+                        visible
+                    />}  
 
                     {this.state.horario.domAm.length > 0 && this.state.selectedDay === "dom" && <Form.Field>
                     <label>Horarios en la mañana</label>
@@ -1150,6 +1192,13 @@ export default class ModalInscripcion extends Component {
                       </Card.Group>
                       </Form.Group>
                     </Form.Field>}
+
+                    {this.state.horario.domAm.length === 0 && this.state.horario.domPm.length === 0 && this.state.selectedDay === "dom" && <Message
+                        warning
+                        header="No hay horarios programados."
+                        content="No se han programado aún horarios ni en la mañana ni en la tarde para los días Domingo. Para más información, comunicate con tu parroquia."
+                        visible
+                    />} 
 
                     {this.state.selectedEucaristias.length > 0 && <Form.Field><Divider />
                       <label>Horarios escogidos</label>

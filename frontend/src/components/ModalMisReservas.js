@@ -190,7 +190,7 @@ export default class ModalMisReservas extends Component {
     }
     else{
       const diff = (reserva.fecha.getTime() - new Date().getTime()) / 1000;
-      if(diff < (3600 * 12)){
+      if(diff < (3600 * 24)){
         return false;
       }
       else{

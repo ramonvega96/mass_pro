@@ -24,7 +24,7 @@ function App() {
   }, []);
 
   function setFilteredValues(val){
-    setFilteredParroquias(parroquias.filter(p => p.nombre.toLowerCase().includes(val.toLowerCase())));
+    setFilteredParroquias(parroquias.filter(p => (p.nombre.toLowerCase().includes(val.toLowerCase()) || p.ubicacion.toLowerCase().includes(val.toLowerCase()))));
   }
 
   function refreshOnEdit(newParroquia){
@@ -71,7 +71,7 @@ function App() {
 
   return (
     <section className="App">
-      <Input id="buscar-parroquia" fluid icon='search' placeholder='Busca tu parroquia por su nombre!' onChange={e => setFilteredValues(e.target.value)}/>
+      <Input id="buscar-parroquia" fluid icon='search' placeholder='Busca tu parroquia por su nombre o ubicación!' onChange={e => setFilteredValues(e.target.value)}/>
       <SpeedDial />
       <Router>
         <Route exact path="/" component={IndexPage} />
