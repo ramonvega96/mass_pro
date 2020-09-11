@@ -15,6 +15,7 @@ db = conn.webapp
 
 # crear colecciones
 usuarios = db.usuarios
+eucaristias_db = db.eucaristias
 
 def autenticarUsuario(user):
     userId = user.get("id")
@@ -33,6 +34,22 @@ def autenticarUsuario(user):
             "error": "Password incorrecto."
         }
         return resp
+
+    idsList = usuario.get("reservas")
+    active_reservas = eucaristias_db.find( { "id": { "$in": idsList }, "available": True } , {"id": 1, "_id":0})
+    
+    idsList = []
+    for i in active_reservas:
+        idsList.append(i.get("id"))
+
+    usuarios.update(
+        {"id": userId},
+        {"$set": 
+            {
+                "reservas": idsList
+            }
+        }
+    )
 
     del usuario["_id"]
     del usuario["password"]
