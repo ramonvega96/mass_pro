@@ -204,8 +204,9 @@ def forgotUserPassword():
     try:
         mail.send(msg)
     except:
+        userDB.deleteUsuario(NBData)        
         return {
-            "error": "El correo que proporcionaste al inscribirte, no es un correo válido. Ponte en contacto con nosotros."
+            "error": "Tu usuario fue ELIMINADO: Proporcionaste un correo inválido al inscribirte. Por favor crear tu usuario nuevamente con un correo válido."
         }    
     
     obj = {"email": userInfo.get("email")} 
@@ -269,35 +270,6 @@ def enableParroquia():
 
     obj = {"email": ans.get("email")} 
     return obj
-
-@app.route('/api/sendMsg', methods = ['POST'])
-def sendMsg():  
-    NBData = request.get_json()
-    msg = Message('Protocol Meet: Nuevo Mensaje De Usuario.', recipients = ['noreply.massproject@gmail.com'])    
-    msg.html = """<div style="
-        font-family:Trebuchet MS, Helvetica, sans-serif;
-        color: white;
-        border-radius: 15px 50px 30px;
-        background:#80ed72; padding: 20px;
-        width: 70%;
-        margin: 0 auto;">
-            <h2>¡Hola! Un usuario mandó el siguiente mansaje:</h2>
-            <p style="text-align: center; font-size: 20px; color: white;"> Motivo: """ + str(NBData.get("motivo")) + """</p>
-            <p style="text-align: center; font-size: 20px; color: white;"> Mensaje: """ + str(NBData.get("msg")) + """</p>
-            <p style="text-align: center; font-size: 20px; color: white;"> Contacto: """ + str(NBData.get("contact")) + """</p>
-    </div>"""
-    
-    try:
-        mail.send(msg)
-    except:
-        return {
-            "error": "Ocurrió un error. Por favor intenta enviar el mensaje de nuevo."
-        }
-
-    obj = {"success": "Mensaje Enviado"} 
-    return obj
-
-
 
 # Background tastks
 

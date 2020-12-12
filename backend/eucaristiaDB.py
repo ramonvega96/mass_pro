@@ -28,6 +28,22 @@ horarios_db = db.horarios
 
 horarios = [
       {
+        'key': '400',
+        'text': '04:00 a.m'
+      },
+      {
+        'key': '430',
+        'text': '04:30 a.m'
+      },
+      {
+        'key': '500',
+        'text': '05:00 a.m'
+      },
+      {
+        'key': '530',
+        'text': '05:30 a.m'
+      },
+      {
         'key': '600',
         'text': '06:00 a.m'
       },

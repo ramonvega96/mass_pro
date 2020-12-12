@@ -2,6 +2,8 @@ from pymongo import MongoClient
 import json
 import os
 
+import eucaristiaDB
+
 # establecer conexion
 conn = MongoClient(
     os.environ['MONGODB_HOST'], 
@@ -86,3 +88,16 @@ def recoverPassword(data):
 
     return res
 
+def deleteUsuario(data):
+    userId = data.get("userId")
+    usuario = usuarios.find_one( { "id": userId } )
+
+    if len(usuario["reservas"]) > 0:
+        usuario = autenticarUsuario({ "id": userId, "password": usuario["password"] })
+
+    if len(usuario["reservas"]) > 0:
+        reservas = usuario["reservas"]
+        for i in reservas:
+            eucaristiaDB.deleteReserva({ "usuario": userId, "eucaristia": i })
+
+    usuarios.remove( { "id": userId } )

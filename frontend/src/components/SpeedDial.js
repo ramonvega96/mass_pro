@@ -6,7 +6,7 @@ import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
 import ChatIcon from '@material-ui/icons/Chat';
-import { Header, Image, Modal, Icon, Accordion, Button, Form, TextArea, Message} from 'semantic-ui-react';
+import { Header, Image, Modal, Icon, Accordion, Button} from 'semantic-ui-react';
 import YouTube from 'react-youtube';
 import qr_donacion from '../images/qr_donacion.jpeg';
 
@@ -34,14 +34,7 @@ export default function SpeedDials() {
   const [openContact, setOpenContact] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState(-1);
   const [videoId, setVideoId] = React.useState("YaKWUpzuQX8");
-  
-  const [motivo, setMotivo] = React.useState("");
-  const [mensaje, setMensaje] = React.useState("");
-  const [contact, setContact] = React.useState("");
-  const [result, setResult] = React.useState("");
 
-  
-  
   const handleClose = () => {
     setOpen(false);
   };
@@ -55,19 +48,7 @@ export default function SpeedDials() {
     const newIndex = activeIndex === index ? -1 : index
     setActiveIndex(newIndex)
   }
-
-  const handleChange = (e, {value}) => {
-    setMotivo(value)
-  }
-  
-  const options = [
-    { key: 1, text: 'Sugerencia', value: "Sugerencia" },
-    { key: 2, text: 'Pregunta', value: "Pregunta" },
-    { key: 3, text: 'Reportar una falla', value: "Falla" },
-    { key: 4, text: 'Uso indebido de mis datos', value: "Uso de datos" },
-    { key: 5, text: 'Otro', value: "Otro" }
-  ]
-
+ 
   return (
     <div>
         <SpeedDial
@@ -101,10 +82,6 @@ export default function SpeedDials() {
                             handleClose();
                             break;
                         case "contact":
-                            setMotivo("");
-                            setMensaje("");
-                            setContact("");
-                            setResult("");
                             setOpenHelp(false);
                             setOpenInfo(false);
                             setOpenContact(true);
@@ -206,98 +183,9 @@ export default function SpeedDials() {
         <Modal open={openContact} closeIcon onClose={() => setOpenContact(!openContact)} size="mini">
             <Modal.Header>Contactanos</Modal.Header>
             <Modal.Content>
-                {!result && <Form>
-                    <Form.Field required>
-                        <label>Motivo</label>
-                        <Form.Select 
-                        placeholder="Motivo de tu mensaje" 
-                        options={options} 
-                        selection 
-                        value={motivo}
-                        onChange={handleChange.bind(this)} />
-                    </Form.Field>
-                    <Form.Field required>
-                      <label>Mensaje</label>
-                      <TextArea 
-                        placeholder='Mensaje' 
-                        style={{ minHeight: 100 }} 
-                        onChange={e => setMensaje(e.target.value)}
-                        value={mensaje}/>
-                  </Form.Field>
-                  <Form.Field required>
-                      <label>¿Cómo te podemos contactar?</label>
-                      <input 
-                        placeholder='Déjanos tu teléfono o email' 
-                        onChange={e => setContact(e.target.value)}
-                        value={contact}/>
-                  </Form.Field>
-                  <Button.Group>
-                        <Button
-                        negative
-                        icon='arrow circle left'
-                        labelPosition='left'
-                        content='Volver'
-                        onClick={() => {
-                            setMensaje("");
-                            setContact("");
-                            setOpenContact(!openContact);
-                            handleClose();
-                        }}
-                        />
-                        <Button.Or text='O'/>
-                        <Button
-                        positive
-                        icon='paper plane'
-                        labelPosition='right'
-                        content='Enviar'
-                        disabled={!mensaje || !contact || !motivo}
-                        onClick={() => {
-
-                            const msgData = {
-                                motivo: motivo,
-                                msg: mensaje,
-                                contact: contact                
-                            }
-
-                          fetch("/api/sendMsg", {
-                                method: "POST",
-                                headers: {
-                                  "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify(msgData)
-                              }).then(res =>
-                                res.json().then(data => {
-                                    if(!res.ok){
-                                        setResult({
-                                            error: "Error interno. Por favor vuelva a intentar."
-                                        });
-                                    }
-                                    else{
-                                        setMotivo("");
-                                        setMensaje("");
-                                        setContact("");
-                                        setResult(data);
-                                    }
-                                })
-                              );
-                        }}
-                        />
-                    </Button.Group>
-                </Form>}
-                {result.success && <Message
-                        icon='paper plane'
-                        success
-                        header='Recibimos tu mensaje'
-                        content={result.success}
-                        visible
-                    />}
-                {result.error && <Message
-                        icon='frown'
-                        error
-                        header='Hubo un error enviando tu mensaje'
-                        content={result.error}
-                        visible
-                    />}
+                <Button color='green' href="https://wa.me/573194203184">
+                    <Icon name='whatsapp' /> Escribenos a nuestro Whatsapp haciendo click aquí
+                </Button>
             </Modal.Content>
         </Modal>
 
