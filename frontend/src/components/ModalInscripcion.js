@@ -152,6 +152,26 @@ export default class ModalInscripcion extends Component {
 
     const horariosAm = [
       {
+        key: '400',
+        text: '04:00 a.m',
+        value: '400'
+      },
+      {
+        key: '430',
+        text: '04:30 a.m',
+        value: '430'
+      },
+      {
+        key: '500',
+        text: '05:00 a.m',
+        value: '500'
+      },
+      {
+        key: '530',
+        text: '05:30 a.m',
+        value: '530'
+      },
+      {
         key: '600',
         text: '06:00 a.m',
         value: '600'
