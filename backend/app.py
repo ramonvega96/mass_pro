@@ -92,6 +92,18 @@ def crearUsuario():
     NBData = request.get_json()
     return userDB.crearUsuario(NBData)
 
+@app.route('/api/updateUser', methods = ['POST'])
+def updateUsuario():
+    # Editar usuario
+    NBData = request.get_json()
+    return userDB.updateUsuario(NBData)
+
+@app.route('/api/deleteUser', methods = ['POST'])
+def deleteUsuario():
+    # Eliminar usuario
+    NBData = request.get_json()
+    return userDB.deleteUsuario(NBData)
+
 @app.route('/api/getHorarioParroquia', methods = ['POST'])
 def getHorarioParroquia():
     # Get horario parroquia con nit

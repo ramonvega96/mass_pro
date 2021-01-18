@@ -101,3 +101,25 @@ def deleteUsuario(data):
             eucaristiaDB.deleteReserva({ "usuario": userId, "eucaristia": i })
 
     usuarios.remove( { "id": userId } )
+
+    return data
+
+def updateUsuario(data):
+    userId = data.get("id")
+
+    usuarios.update(
+        {"id": userId},
+        {"$set":
+            {
+                "password" : data.get("password"),
+                "nombre" : data.get("nombre"),
+                "direccion" : data.get("direccion"),
+                "telefono" : data.get("telefono"),
+                "email" : data.get("email"),
+                "ubicacion" : data.get("ubicacion")
+            }
+        }
+    )
+
+    del data["password"]
+    return data

@@ -435,18 +435,19 @@ def deleteReserva(data):
         )
   
   eucaristia = eucaristias_db.find_one( { "id": eucaristiaId } )
-  asistentes = eucaristia.get("asistentes")
-  asistentes = [i for i in asistentes if i.get("id") != userId]
-  cupos = eucaristia.get("cupos") + 1
-  eucaristias_db.update(
-          {"id": eucaristiaId},
-          {"$set": 
-              {
-                  "asistentes": asistentes,
-                  "cupos": cupos
-              }
-          }
-      )
+  if eucaristia is not None:
+    asistentes = eucaristia.get("asistentes")
+    asistentes = [i for i in asistentes if i.get("id") != userId]
+    cupos = eucaristia.get("cupos") + 1
+    eucaristias_db.update(
+            {"id": eucaristiaId},
+            {"$set": 
+                {
+                    "asistentes": asistentes,
+                    "cupos": cupos
+                }
+            }
+        )
 
   return data
 
