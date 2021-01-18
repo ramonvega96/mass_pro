@@ -154,6 +154,30 @@ horarios = [
       {
         'key': '1930',
         'text': '07:30 p.m'
+      },
+      {
+        'key': '2000',
+        'text': '08:00 p.m'
+      },
+      {
+        'key': '2030',
+        'text': '08:30 p.m'
+      },
+      {
+        'key': '2100',
+        'text': '09:00 p.m'
+      },
+      {
+        'key': '2130',
+        'text': '09:30 p.m'
+      },
+      {
+        'key': '2200',
+        'text': '10:00 p.m'
+      },
+      {
+        'key': '2230',
+        'text': '10:30 p.m'
       }
     ]
 
@@ -424,15 +448,17 @@ def deleteReserva(data):
   eucaristiaId = data.get("eucaristia")
 
   reservas = usuarios.find_one( { "id": userId } ).get("reservas")
-  reservas.remove(eucaristiaId)
-  usuarios.update(
-            {"id": userId},
-            {"$set": 
-                {
-                    "reservas": reservas
-                }
-            }
-        )
+  
+  if eucaristiaId in reservas:
+    reservas.remove(eucaristiaId)
+    usuarios.update(
+              {"id": userId},
+              {"$set": 
+                  {
+                      "reservas": reservas
+                  }
+              }
+          )
   
   eucaristia = eucaristias_db.find_one( { "id": eucaristiaId } )
   if eucaristia is not None:
