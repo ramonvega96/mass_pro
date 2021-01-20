@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import json
 import os
+import time
 
 import eucaristiaDB
 
@@ -48,7 +49,8 @@ def autenticarUsuario(user):
         {"id": userId},
         {"$set": 
             {
-                "reservas": idsList
+                "reservas": idsList,
+                "latestlogin": int(time.time())
             }
         }
     )
